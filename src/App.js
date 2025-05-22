@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import SubmitPuzzle from './SubmitPuzzle';
 import './App.css';
+import logo from './logo-transparent.png';
 
 function PlayGame() {
   const [puzzles, setPuzzles] = useState([]);
@@ -19,7 +20,7 @@ function PlayGame() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      console.log('Fetched puzzles:', data, error); // Debug output
+      console.log('Fetched puzzles:', data, error);
 
       if (error) {
         console.error('Error fetching puzzles:', error);
@@ -56,8 +57,11 @@ function PlayGame() {
   const current = puzzles[index];
 
   return (
-    <div>
-      <h2>Emoji Rebus Game</h2>
+    <div className="game-container">
+      <header className="logo-header">
+        <img src={logo} alt="EmojiCode logo" className="logo-large" />
+      </header>
+      <div className="subtitle">Guess the emoji puzzle!</div>
       <div className="puzzle">{current.emojis}</div>
       <input
         type="text"

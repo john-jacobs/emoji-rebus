@@ -39,7 +39,7 @@ export default function SubmitPuzzle() {
 
   return (
     <div className="submit-form">
-      <h2>Submit a Rebus Puzzle</h2>
+      <h2>Submit an EmojiCode</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
