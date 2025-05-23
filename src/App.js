@@ -12,6 +12,7 @@ function PlayGame() {
   const [guess, setGuess] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     const fetchPuzzles = async () => {
@@ -47,6 +48,7 @@ function PlayGame() {
     setIndex((prev) => (prev + 1) % puzzles.length);
     setGuess('');
     setResult('');
+    setShowHint(false);
   };
 
   if (loading) return <p>Loading puzzles...</p>;
@@ -72,8 +74,19 @@ function PlayGame() {
         <button onClick={nextPuzzle} style={{ marginLeft: '0.75rem' }}>Skip</button>
       </div>
       <div className="result">{result}</div>
+      {current.type && (
+        <div className="puzzle-type">
+          {current.type === 'Phonetic'
+            ? '🔤 Phonetic'
+            : current.type === 'Symbolic'
+            ? '🧩 Symbolic'
+            : '📝 Other'}
+        </div>
+      )}
+      <div className="hint" style={{ cursor: 'pointer' }} onClick={() => setShowHint(!showHint)}>
+        {showHint ? `Hint: ${current.hint}` : 'Show Hint'}
+      </div>
       {result === '✅ Correct!' && <button onClick={nextPuzzle}>Next</button>}
-      <div className="hint">Hint: {current.hint}</div>
     </div>
   );
 }

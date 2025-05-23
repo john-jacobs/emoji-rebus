@@ -92,6 +92,19 @@ nav a:focus {
   letter-spacing: 0.06em;
 }
 
+/* Puzzle type display */
+.puzzle-type {
+  font-size: 1.09rem;
+  margin-bottom: 0.8rem;
+  color: #f7b801;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+}
+
 /* Input & Button */
 input[type="text"] {
   padding: 0.8rem;
@@ -139,6 +152,57 @@ button:focus {
   font-size: 1rem;
 }
 
+/* ----- SUBMIT FORM STYLES ----- */
+.submit-form {
+  background: none;
+  border-radius: 1.2rem;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+.submit-form h2 {
+  margin-top: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #17264d;
+}
+
+.form-group {
+  margin: 1.2rem 0 1.4rem 0;
+  text-align: left;
+  max-width: 390px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-group > label {
+  font-weight: 500;
+  margin-right: 0.8rem;
+  font-size: 1.1rem;
+  color: #17264d;
+}
+
+.form-group input[type="radio"] {
+  margin-right: 0.35em;
+  accent-color: #f7b801;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: middle;
+}
+
+.form-group label[for] {
+  font-weight: 400;
+  margin-right: 1.2rem;
+  font-size: 1.06rem;
+}
+
+.form-group label span {
+  color: #d33;
+  font-weight: 700;
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
   .app {
@@ -158,6 +222,10 @@ button:focus {
   }
   .puzzle {
     font-size: 2.1rem;
+  }
+  .form-group {
+    font-size: 1rem;
+    margin: 1rem 0 1.2rem 0;
   }
 }
 
