@@ -20,8 +20,6 @@ function PlayGame() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      console.log('Fetched puzzles:', data, error);
-
       if (error) {
         console.error('Error fetching puzzles:', error);
       } else {
@@ -69,7 +67,10 @@ function PlayGame() {
         onChange={(e) => setGuess(e.target.value)}
         placeholder="Your guess..."
       />
-      <button onClick={handleSubmit}>Submit</button>
+      <div>
+        <button onClick={handleSubmit}>Submit</button>
+        <button onClick={nextPuzzle} style={{ marginLeft: '0.75rem' }}>Skip</button>
+      </div>
       <div className="result">{result}</div>
       {result === '✅ Correct!' && <button onClick={nextPuzzle}>Next</button>}
       <div className="hint">Hint: {current.hint}</div>
