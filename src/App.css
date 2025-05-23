@@ -54,11 +54,14 @@ nav a:focus {
 
 @media (max-width: 600px) {
   .logo-large {
-    height: 120px;
+    height: 38vw;
+    min-height: 100px;
+    max-height: 38vw;
     max-width: 98vw;
   }
 }
 
+/* Subtitle below logo */
 .subtitle {
   width: 100%;
   text-align: center;
@@ -140,10 +143,6 @@ button:focus {
 @media (max-width: 600px) {
   .app {
     padding: 0.7rem;
-    max-width: 98vw;
-  }
-  .logo-large {
-    height: 70px;
     max-width: 98vw;
   }
   input[type="text"] {
