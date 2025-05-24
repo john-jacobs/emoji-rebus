@@ -79,6 +79,49 @@ nav a:focus {
   }
 }
 
+/* Tag selector styles */
+.tag-selector {
+  margin: 1.5rem 0 1.1rem 0;
+  font-size: 1.07rem;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6em 0.9em;
+  margin-top: 0.3em;
+}
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #f7b801;
+  border-radius: 0.7em;
+  padding: 0.24em 0.7em 0.24em 0.5em;
+  font-size: 0.98em;
+  background: #fffdfa;
+  color: #17264d;
+  cursor: pointer;
+  transition: background 0.17s, border 0.17s, color 0.17s;
+  font-weight: 500;
+  margin: 0 0.15em 0.22em 0.15em;
+  outline: none;
+  border-style: solid;
+  border-width: 1.5px;
+  border-color: #f7b801;
+  user-select: none;
+}
+
+.tag-item.selected,
+.tag-item[aria-pressed="true"] {
+  background: #f7b801;
+  color: #17264d;
+  border: 1.5px solid #17264d;
+}
+
+.tag-item:focus {
+  outline: 2px solid #f7b801;
+}
+
 /* Game Container */
 .game-container {
   background: none;
@@ -150,6 +193,11 @@ button:focus {
   color: #555;
   margin-top: 1rem;
   font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.hint:hover {
+  color: #f7b801;
 }
 
 /* ----- SUBMIT FORM STYLES ----- */
