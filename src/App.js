@@ -16,6 +16,12 @@ function PlayGame() {
   const [showHint, setShowHint] = useState(false);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
+  // State for guesses/results per puzzle in "all" mode
+  const [allGuesses, setAllGuesses] = useState({});
+  const [allResults, setAllResults] = useState({});
+  const [allHints, setAllHints] = useState({});
 
   // Fetch all puzzles and tags
   useEffect(() => {
@@ -57,6 +63,10 @@ function PlayGame() {
       setPuzzles(filtered);
       setIndex(0);
     }
+    // Reset per-puzzle state when tag filter changes
+    setAllGuesses({});
+    setAllResults({});
+    setAllHints({});
   }, [selectedTags, allPuzzles]);
 
   // Levenshtein distance function for fuzzy matching
@@ -76,9 +86,9 @@ function PlayGame() {
           matrix[i][j] = matrix[i - 1][j - 1];
         } else {
           matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1, // substitution
-            matrix[i][j - 1] + 1,     // insertion
-            matrix[i - 1][j] + 1      // deletion
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
           );
         }
       }
@@ -86,14 +96,12 @@ function PlayGame() {
     return matrix[b.length][a.length];
   }
 
+  // Single puzzle submit
   const handleSubmit = () => {
     const currentPuzzle = puzzles[index];
     if (!currentPuzzle) return;
-
     const normalizedGuess = guess.trim().toLowerCase();
     const correctAnswer = currentPuzzle.answer.trim().toLowerCase();
-
-    // Accept if exactly correct, or edit distance <= 2
     if (
       normalizedGuess === correctAnswer ||
       levenshtein(normalizedGuess, correctAnswer) <= 2
@@ -104,13 +112,23 @@ function PlayGame() {
     }
   };
 
-  const nextPuzzle = () => {
-    setIndex((prev) => (prev + 1) % puzzles.length);
-    setGuess('');
-    setResult('');
-    setShowHint(false);
+  // All puzzles submit
+  const handleAllSubmit = (puzzleId, userGuess, answer) => {
+    const normalizedGuess = userGuess.trim().toLowerCase();
+    const correctAnswer = answer.trim().toLowerCase();
+    let newResults = { ...allResults };
+    if (
+      normalizedGuess === correctAnswer ||
+      levenshtein(normalizedGuess, correctAnswer) <= 2
+    ) {
+      newResults[puzzleId] = `✅ Correct! The answer is: "${answer}"`;
+    } else {
+      newResults[puzzleId] = '❌ Try Again';
+    }
+    setAllResults(newResults);
   };
 
+  // Tag toggle (buttons only)
   const handleTagToggle = (tag) => {
     setSelectedTags(prev =>
       prev.includes(tag)
@@ -131,6 +149,23 @@ function PlayGame() {
       </header>
       <div className="subtitle">Guess the emoji puzzle!</div>
 
+      {/* View toggle */}
+      <div style={{ marginBottom: "1.2rem" }}>
+        <button
+          className={!showAll ? "selected" : ""}
+          style={{ marginRight: "0.7em" }}
+          onClick={() => setShowAll(false)}
+        >
+          One at a time
+        </button>
+        <button
+          className={showAll ? "selected" : ""}
+          onClick={() => setShowAll(true)}
+        >
+          Show all
+        </button>
+      </div>
+
       {/* Tag selector as BUTTONS ONLY */}
       <div className="tag-selector">
         <strong>Filter by Tag:</strong>
@@ -149,31 +184,104 @@ function PlayGame() {
         </div>
       </div>
 
-      <div className="puzzle">{current.emojis}</div>
-      <input
-        type="text"
-        value={guess}
-        onChange={(e) => setGuess(e.target.value)}
-        placeholder="Your guess..."
-      />
-      <div>
-        <button onClick={handleSubmit}>Submit</button>
-        <button onClick={nextPuzzle} style={{ marginLeft: '0.75rem' }}>Skip</button>
-      </div>
-      <div className="result">{result}</div>
-      {current.type && (
-        <div className="puzzle-type">
-          {current.type === 'Phonetic'
-            ? '🔤 Phonetic'
-            : current.type === 'Symbolic'
-            ? '🧩 Symbolic'
-            : '📝 Other'}
+      {!showAll ? (
+        // Classic single-puzzle mode
+        <>
+          <div className="puzzle">{current.emojis}</div>
+          <input
+            type="text"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+            placeholder="Your guess..."
+          />
+          <div>
+            <button onClick={handleSubmit}>Submit</button>
+            <button onClick={() => {
+              setIndex((prev) => (prev + 1) % puzzles.length);
+              setGuess('');
+              setResult('');
+              setShowHint(false);
+            }} style={{ marginLeft: '0.75rem' }}>Skip</button>
+          </div>
+          <div className="result">{result}</div>
+          {current.type && (
+            <div className="puzzle-type">
+              {current.type === 'Phonetic'
+                ? '🔤 Phonetic'
+                : current.type === 'Symbolic'
+                ? '🧩 Symbolic'
+                : '📝 Other'}
+            </div>
+          )}
+          <div
+            className="hint"
+            style={{ cursor: 'pointer' }}
+            onClick={() => setShowHint(!showHint)}
+          >
+            {showHint ? `Hint: ${current.hint}` : 'Show Hint'}
+          </div>
+          {result && result.startsWith('✅') && (
+            <button onClick={() => {
+              setIndex((prev) => (prev + 1) % puzzles.length);
+              setGuess('');
+              setResult('');
+              setShowHint(false);
+            }}>Next</button>
+          )}
+        </>
+      ) : (
+        // "All" mode: List all puzzles in a grid
+        <div className="puzzle-grid">
+          {puzzles.map((puzzle) => (
+            <div key={puzzle.id} className="puzzle-card">
+              <div className="puzzle">{puzzle.emojis}</div>
+              <input
+                type="text"
+                value={allGuesses[puzzle.id] || ""}
+                onChange={e =>
+                  setAllGuesses(g => ({ ...g, [puzzle.id]: e.target.value }))
+                }
+                placeholder="Your guess..."
+              />
+              <div>
+                <button
+                  onClick={() =>
+                    handleAllSubmit(
+                      puzzle.id,
+                      allGuesses[puzzle.id] || "",
+                      puzzle.answer
+                    )
+                  }
+                >
+                  Submit
+                </button>
+              </div>
+              <div className="result">{allResults[puzzle.id] || ""}</div>
+              {puzzle.type && (
+                <div className="puzzle-type">
+                  {puzzle.type === 'Phonetic'
+                    ? '🔤 Phonetic'
+                    : puzzle.type === 'Symbolic'
+                    ? '🧩 Symbolic'
+                    : '📝 Other'}
+                </div>
+              )}
+              <div
+                className="hint"
+                style={{ cursor: 'pointer' }}
+                onClick={() =>
+                  setAllHints(hints => ({
+                    ...hints,
+                    [puzzle.id]: !hints[puzzle.id],
+                  }))
+                }
+              >
+                {allHints[puzzle.id] ? `Hint: ${puzzle.hint}` : 'Show Hint'}
+              </div>
+            </div>
+          ))}
         </div>
       )}
-      <div className="hint" style={{ cursor: 'pointer' }} onClick={() => setShowHint(!showHint)}>
-        {showHint ? `Hint: ${current.hint}` : 'Show Hint'}
-      </div>
-      {result && result.startsWith('✅') && <button onClick={nextPuzzle}>Next</button>}
     </div>
   );
 }

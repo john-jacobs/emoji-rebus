@@ -282,3 +282,53 @@ input:focus, button:focus {
   outline: 2px solid #f7b801;
   outline-offset: 2px;
 }
+
+/* Puzzle grid for 'Show all' mode */
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.3rem;
+  margin: 2rem 0 1rem 0;
+}
+.puzzle-card {
+  background: #fffdfa;
+  border: 1.5px solid #f7b801;
+  border-radius: 1.15rem;
+  box-shadow: 0 2px 8px rgba(23,38,77,0.06);
+  padding: 1.25rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.puzzle-card .puzzle {
+  font-size: 2.1rem;
+  margin: 0.7rem 0 0.9rem 0;
+}
+
+.puzzle-card input[type="text"] {
+  width: 93%;
+  max-width: 210px;
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+  padding: 0.6rem;
+}
+
+.puzzle-card button {
+  width: 100%;
+  max-width: 140px;
+  margin: 0.2rem 0 0.5rem 0;
+}
+
+.puzzle-card .result {
+  min-height: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+@media (max-width: 600px) {
+  .puzzle-grid {
+    grid-template-columns: 1fr;
+  }
+  .puzzle-card {
+    padding: 0.7rem 0.2rem 0.8rem 0.2rem;
+  }
+}
