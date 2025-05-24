@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { supabase } from './supabaseClient';
-import SubmitPuzzle from './SubmitPuzzle';
-import './App.css';
-import logo from './logo-transparent.png';
+// File: src/App.js
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { supabase } from "./supabaseClient";
+import SubmitPuzzle from "./SubmitPuzzle";
+import PuzzleGrid from "./PuzzleGrid";
+import "./App.css";
+import logo from "./logo-transparent.png";
 
 function PlayGame() {
   const [puzzles, setPuzzles] = useState([]);
@@ -15,10 +17,6 @@ function PlayGame() {
   const [showHint, setShowHint] = useState(false);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [tagSearch, setTagSearch] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const inputRef = useRef();
 
   // Fetch all puzzles and tags
   useEffect(() => {
@@ -114,40 +112,13 @@ function PlayGame() {
     setShowHint(false);
   };
 
-  // Chips logic
-  const handleRemoveTag = (tag) => {
-    setSelectedTags(selectedTags.filter(t => t !== tag));
+  const handleTagToggle = (tag) => {
+    setSelectedTags(prev =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : [...prev, tag]
+    );
   };
-
-  const handleDropdownSelect = (tag) => {
-    if (!selectedTags.includes(tag)) {
-      setSelectedTags([...selectedTags, tag]);
-      setTagSearch('');
-      setShowDropdown(false);
-    }
-  };
-
-  const filteredTags = tags.filter(
-    tag =>
-      tag.toLowerCase().includes(tagSearch.toLowerCase()) &&
-      !selectedTags.includes(tag)
-  );
-
-  // Hide dropdown when clicking outside
-  useEffect(() => {
-    const handleClick = (event) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-    if (showDropdown) {
-      document.addEventListener('mousedown', handleClick);
-    }
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [showDropdown]);
 
   if (loading) return <p>Loading puzzles...</p>;
   if (puzzles.length === 0) return <p>No puzzles found for these tags.</p>;
@@ -159,62 +130,26 @@ function PlayGame() {
       <header className="logo-header">
         <img src={logo} alt="EmojiCode logo" className="logo-large" />
       </header>
-
-      {/* Tag chip selector with search bar and chips below */}
-      <div className="tag-chip-selector">
+      {/* Tag selector */}
+      <div className="tag-selector">
         <strong>Filter by Tag:</strong>
-        <div className="chip-search-center">
-          <span className="tag-chip-input-wrapper" ref={inputRef}>
-            <input
-              className="tag-chip-input"
-              type="text"
-              placeholder="Search and add tag."
-              value={tagSearch}
-              onChange={e => {
-                setTagSearch(e.target.value);
-                setShowDropdown(true);
-              }}
-              onFocus={() => setShowDropdown(true)}
-            />
-            {showDropdown && (
-              <div className="tag-chip-dropdown">
-                {filteredTags.length === 0 ? (
-                  <div className="tag-chip-dropdown-item" style={{ color: '#aaa', cursor: 'not-allowed' }}>
-                    No tags found
-                  </div>
-                ) : (
-                  filteredTags.map(tag => (
-                    <div
-                      key={tag}
-                      className="tag-chip-dropdown-item"
-                      onMouseDown={() => handleDropdownSelect(tag)}
-                    >
-                      {tag}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </span>
-        </div>
-        <div className="chip-list-row">
-          {selectedTags.map(tag => (
-            <span className="chip" key={tag}>
+        <div className="tag-list">
+          {tags.map(tag => (
+            <label key={tag} className={`tag-item${selectedTags.includes(tag) ? ' selected' : ''}`}>
+              <input
+                type="checkbox"
+                checked={selectedTags.includes(tag)}
+                onChange={() => handleTagToggle(tag)}
+              />
               {tag}
-              <button
-                className="chip-remove"
-                onClick={() => handleRemoveTag(tag)}
-                aria-label={`Remove ${tag}`}
-                type="button"
-              >×</button>
-            </span>
+            </label>
           ))}
         </div>
       </div>
-
       {/* Puzzle metadata */}
       <div className="puzzle-meta">
-        {current.type && (
+        <div>
+          <span className="meta-label">Puzzle Type: </span>
           <span className="meta-type">
             {current.type === 'Phonetic'
               ? '🔤 Phonetic'
@@ -222,18 +157,21 @@ function PlayGame() {
               ? '🧩 Symbolic'
               : '📝 Other'}
           </span>
-        )}
+        </div>
         {current.tags && current.tags.length > 0 && (
-          <span className="meta-tags">
-            {current.tags.map((tag, i) => (
-              <span className="meta-tag" key={tag}>
-                {tag}{i < current.tags.length - 1 ? ',' : ''}
-              </span>
-            ))}
-          </span>
+          <div>
+            <span className="meta-label">Tags: </span>
+            <span className="meta-tags">
+              {current.tags.map((tag, i) => (
+                <span className="meta-tag" key={tag}>
+                  {tag}{i < current.tags.length - 1 ? ',' : ''}
+                </span>
+              ))}
+            </span>
+          </div>
         )}
       </div>
-
+      <div className="puzzle-label"><strong>Puzzle</strong></div>
       <div className="puzzle">{current.emojis}</div>
       <input
         type="text"
@@ -259,11 +197,12 @@ function App() {
     <Router>
       <div className="app">
         <nav>
-          <Link to="/">Play</Link> | <Link to="/submit">Create</Link>
+          <Link to="/">Play</Link> | <Link to="/submit">Create</Link> | <Link to="/grid">All Puzzles</Link>
         </nav>
         <Routes>
           <Route path="/" element={<PlayGame />} />
           <Route path="/submit" element={<SubmitPuzzle />} />
+          <Route path="/grid" element={<PuzzleGrid />} />
         </Routes>
       </div>
     </Router>
