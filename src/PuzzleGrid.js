@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
 
 export default function PuzzleGrid() {
   const [puzzles, setPuzzles] = useState([]);
@@ -11,6 +12,7 @@ export default function PuzzleGrid() {
   const [results, setResults] = useState({});
   const [showHints, setShowHints] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPuzzles = async () => {
@@ -157,7 +159,12 @@ export default function PuzzleGrid() {
 
       <div className="puzzle-cards">
         {puzzles.map((puzzle) => (
-          <div className="puzzle-card" key={puzzle.id}>
+          <div 
+            className="puzzle-card" 
+            key={puzzle.id}
+            onClick={() => navigate(`/puzzle/${puzzle.id}`)}
+            style={{ cursor: 'pointer' }}
+          >
             {/* Puzzle Display */}
             <div className="puzzle-card-emoji">
               {puzzle.emojis}
@@ -189,41 +196,8 @@ export default function PuzzleGrid() {
               )}
             </div>
 
-            {/* Guess Section */}
-            <div className="puzzle-card-input">
-              <input
-                type="text"
-                value={guesses[puzzle.id] || ""}
-                onChange={(e) => handleInputChange(puzzle.id, e.target.value)}
-                placeholder="Your answer..."
-                className="guess-input"
-              />
-              <button
-                onClick={() => handleGuess(puzzle.id, guesses[puzzle.id] || "")}
-                className="submit-button"
-              >
-                Submit
-              </button>
-            </div>
-
-            {/* Result */}
-            {results[puzzle.id] && (
-              <div className={`puzzle-result ${results[puzzle.id].startsWith("✅") ? "correct" : "incorrect"}`}>
-                {results[puzzle.id]}
-              </div>
-            )}
-
-            {/* Hint Section */}
-            <div className="puzzle-card-hint">
-              <button
-                className="hint-button"
-                onClick={() => handleShowHint(puzzle.id)}
-              >
-                {showHints[puzzle.id] ? "Hide Hint" : "Show Hint"}
-              </button>
-              {showHints[puzzle.id] && (
-                <div className="hint-text">{puzzle.hint}</div>
-              )}
+            <div className="puzzle-card-preview">
+              Click to solve →
             </div>
           </div>
         ))}

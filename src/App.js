@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import SubmitPuzzle from "./SubmitPuzzle";
 import PuzzleGrid from "./PuzzleGrid";
+import PuzzleDetail from "./PuzzleDetail";
 import "./App.css";
 import logo from "./logo-transparent.png";
 
@@ -197,12 +198,13 @@ function App() {
     <Router>
       <div className="app">
         <nav>
-          <Link to="/">Play</Link> | <Link to="/submit">Create</Link> | <Link to="/grid">All Puzzles</Link>
+          <Link to="/">All Puzzles</Link>
+          <Link to="/submit">Create</Link>
         </nav>
         <Routes>
-          <Route path="/" element={<PlayGame />} />
+          <Route path="/" element={<PuzzleGrid />} />
+          <Route path="/puzzle/:id" element={<PuzzleDetail />} />
           <Route path="/submit" element={<SubmitPuzzle />} />
-          <Route path="/grid" element={<PuzzleGrid />} />
         </Routes>
       </div>
     </Router>
