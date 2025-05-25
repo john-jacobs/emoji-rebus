@@ -3,15 +3,13 @@ import { supabase } from "./supabaseClient";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 
-export default function PuzzleGrid() {
+export default function PuzzleGrid({ 
+  selectedTags, 
+  setSelectedTags
+}) {
   const [puzzles, setPuzzles] = useState([]);
   const [allPuzzles, setAllPuzzles] = useState([]);
   const [tags, setTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [guesses, setGuesses] = useState({});
-  const [results, setResults] = useState({});
-  const [showHints, setShowHints] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,69 +45,8 @@ export default function PuzzleGrid() {
       );
     }
     
-    // Filter by search term
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((p) => 
-        p.tags?.some(tag => tag.toLowerCase().includes(term)) ||
-        p.type.toLowerCase().includes(term) ||
-        p.emojis.includes(term)
-      );
-    }
-    
     setPuzzles(filtered);
-  }, [selectedTags, searchTerm, allPuzzles]);
-
-  function levenshtein(a, b) {
-    if (a.length === 0) return b.length;
-    if (b.length === 0) return a.length;
-    const matrix = [];
-    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-    for (let i = 1; i <= b.length; i++) {
-      for (let j = 1; j <= a.length; j++) {
-        if (b.charAt(i - 1) === a.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-    return matrix[b.length][a.length];
-  }
-
-  const handleGuess = (puzzleId, answer) => {
-    const puzzle = puzzles.find((p) => p.id === puzzleId);
-    if (!puzzle) return;
-    const normalizedGuess = answer.trim().toLowerCase();
-    const correct = puzzle.answer.trim().toLowerCase();
-    if (
-      normalizedGuess === correct ||
-      levenshtein(normalizedGuess, correct) <= 2
-    ) {
-      setResults((prev) => ({
-        ...prev,
-        [puzzleId]: `✅ Correct! "${puzzle.answer}"`,
-      }));
-    } else {
-      setResults((prev) => ({
-        ...prev,
-        [puzzleId]: "❌ Try Again",
-      }));
-    }
-  };
-
-  const handleInputChange = (puzzleId, value) => {
-    setGuesses((prev) => ({ ...prev, [puzzleId]: value }));
-  };
-
-  const handleShowHint = (puzzleId) => {
-    setShowHints((prev) => ({ ...prev, [puzzleId]: !prev[puzzleId] }));
-  };
+  }, [selectedTags, allPuzzles]);
 
   const handleTagToggle = (tag) => {
     setSelectedTags((prev) =>
@@ -125,18 +62,8 @@ export default function PuzzleGrid() {
       <div className="puzzle-grid-header-section">
         <h1>Emoji Puzzles</h1>
         
-        {/* Search and Filter Section */}
+        {/* Filter Section */}
         <div className="puzzle-grid-controls">
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search puzzles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          
           <div className="tag-filter">
             <div className="tag-filter-list">
               {tags.map((tag) => (

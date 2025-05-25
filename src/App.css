@@ -15,31 +15,79 @@ body {
 }
 
 nav {
-  margin-bottom: 1rem;
-  text-align: center;
-  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(23, 38, 77, 0.1);
 }
 
-nav a {
+.nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-right: 1.5rem;
+}
+
+.nav-logo-image {
+  height: 65px;
+  width: auto;
+  transition: transform 0.2s;
+}
+
+.nav-logo:hover .nav-logo-image {
+  transform: scale(1.05);
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-links a {
   text-decoration: none;
   color: #17264d;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
   transition: color 0.2s;
   white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
 }
 
-nav a:not(:last-child)::after {
+.nav-links a:not(:last-child)::after {
   content: "|";
-  margin-left: 0.5rem;
+  margin-left: 1rem;
   color: #999;
 }
 
-nav a:hover,
-nav a:focus {
+.nav-links a:hover,
+.nav-links a:focus {
   color: #f7b801;
+}
+
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .nav-logo-image {
+    height: 50px;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
 }
 
 /* Logo Header */
@@ -235,27 +283,6 @@ button:focus {
   flex-direction: column;
   gap: 0.5rem;
   align-items: center;
-}
-
-.search-box {
-  width: 100%;
-  max-width: 400px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
-  border: 2px solid #f7b801;
-  border-radius: 2rem;
-  background: #fffdfa;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #17264d;
-  box-shadow: 0 0 0 3px rgba(247, 184, 1, 0.2);
 }
 
 .tag-filter {
@@ -503,11 +530,6 @@ button:focus {
     gap: 0.4rem;
   }
   
-  .search-input {
-    padding: 0.4rem 0.9rem;
-    font-size: 0.9rem;
-  }
-  
   .tag-filter-list {
     gap: 0.3rem;
   }
@@ -557,8 +579,8 @@ button:focus {
     grid-template-columns: 1fr;
   }
   
-  .search-input {
-    font-size: 0.9rem;
+  .tag-filter-list {
+    gap: 0.3rem;
   }
 }
 
