@@ -13,6 +13,26 @@ export default function PuzzleDetail() {
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  // Function to calculate emoji font size
+  const calculateEmojiSize = (containerWidth, emojiString) => {
+    const baseSize = 64; // Larger base size for detail view
+    const minSize = 24; // Larger minimum size for detail view
+    const emojiCount = Array.from(emojiString).length;
+    const spacing = 0.1; // Letter spacing in em
+    
+    // Calculate the total width needed at base size
+    const totalWidthNeeded = baseSize * emojiCount * (1 + spacing);
+    
+    // If it fits, use base size
+    if (totalWidthNeeded <= containerWidth) {
+      return baseSize;
+    }
+    
+    // Otherwise, scale down proportionally
+    const scaledSize = Math.max(minSize, (containerWidth / emojiCount) / (1 + spacing));
+    return scaledSize;
+  };
+
   useEffect(() => {
     const fetchPuzzle = async () => {
       const { data, error } = await supabase
@@ -77,6 +97,8 @@ export default function PuzzleDetail() {
   if (loading) return <div className="puzzle-detail-loading">Loading puzzle...</div>;
   if (!puzzle) return <div className="puzzle-detail-error">Puzzle not found</div>;
 
+  const emojiSize = calculateEmojiSize(600, puzzle.emojis); // 600px is approximate detail width
+
   return (
     <div className="puzzle-detail">
       <button className="back-button" onClick={() => navigate("/")}>
@@ -114,7 +136,10 @@ export default function PuzzleDetail() {
         </div>
 
         {/* Puzzle Display */}
-        <div className="puzzle-detail-emoji">
+        <div 
+          className="puzzle-detail-emoji"
+          style={{ fontSize: `${emojiSize}px` }}
+        >
           {puzzle.emojis}
         </div>
 

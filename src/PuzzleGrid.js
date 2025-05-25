@@ -15,6 +15,26 @@ export default function PuzzleGrid({
   const [completionStats, setCompletionStats] = useState({ solved: 0, total: 0 });
   const navigate = useNavigate();
 
+  // Function to calculate emoji font size
+  const calculateEmojiSize = (containerWidth, emojiString) => {
+    const baseSize = 40; // Base font size in pixels
+    const minSize = 16; // Minimum font size
+    const emojiCount = Array.from(emojiString).length;
+    const spacing = 0.1; // Letter spacing in em
+    
+    // Calculate the total width needed at base size
+    const totalWidthNeeded = baseSize * emojiCount * (1 + spacing);
+    
+    // If it fits, use base size
+    if (totalWidthNeeded <= containerWidth) {
+      return baseSize;
+    }
+    
+    // Otherwise, scale down proportionally
+    const scaledSize = Math.max(minSize, (containerWidth / emojiCount) / (1 + spacing));
+    return scaledSize;
+  };
+
   useEffect(() => {
     const fetchPuzzles = async () => {
       const { data, error } = await supabase
@@ -169,6 +189,8 @@ export default function PuzzleGrid({
       <div className="puzzle-cards">
         {puzzles.map((puzzle) => {
           const isCompleted = isPuzzleCompleted(puzzle.id);
+          const emojiSize = calculateEmojiSize(300, puzzle.emojis); // 300px is approximate card width
+
           return (
             <div 
               className={`puzzle-card${isCompleted ? " completed" : ""}`}
@@ -184,7 +206,10 @@ export default function PuzzleGrid({
               )}
               
               {/* Puzzle Display */}
-              <div className="puzzle-card-emoji">
+              <div 
+                className="puzzle-card-emoji"
+                style={{ fontSize: `${emojiSize}px` }}
+              >
                 {puzzle.emojis}
               </div>
               
