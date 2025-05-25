@@ -10,6 +10,7 @@ export default function PuzzleGrid() {
   const [guesses, setGuesses] = useState({});
   const [results, setResults] = useState({});
   const [showHints, setShowHints] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchPuzzles = async () => {
@@ -35,15 +36,27 @@ export default function PuzzleGrid() {
   }, []);
 
   useEffect(() => {
-    if (selectedTags.length === 0) {
-      setPuzzles(allPuzzles);
-    } else {
-      const filtered = allPuzzles.filter((p) =>
+    let filtered = [...allPuzzles];
+    
+    // Filter by selected tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((p) =>
         Array.isArray(p.tags) && p.tags.some((tag) => selectedTags.includes(tag))
       );
-      setPuzzles(filtered);
     }
-  }, [selectedTags, allPuzzles]);
+    
+    // Filter by search term
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((p) => 
+        p.tags?.some(tag => tag.toLowerCase().includes(term)) ||
+        p.type.toLowerCase().includes(term) ||
+        p.emojis.includes(term)
+      );
+    }
+    
+    setPuzzles(filtered);
+  }, [selectedTags, searchTerm, allPuzzles]);
 
   function levenshtein(a, b) {
     if (a.length === 0) return b.length;
@@ -103,99 +116,114 @@ export default function PuzzleGrid() {
   };
 
   if (!puzzles.length)
-    return <p style={{ textAlign: "center" }}>Loading puzzles...</p>;
+    return <p className="puzzle-grid-empty">Loading puzzles...</p>;
 
   return (
     <div className="puzzle-grid-container">
-      <h2 style={{ textAlign: "center", margin: "1.5em 0 0.7em" }}>
-        All Emoji Puzzles
-      </h2>
-      {/* Tag Filter Row */}
-      <div className="grid-tag-selector">
-        <strong>Filter by Tag:</strong>
-        <div className="grid-tag-list">
-          {tags.map((tag) => (
-            <button
-              key={tag}
-              className={`grid-tag-item${
-                selectedTags.includes(tag) ? " selected" : ""
-              }`}
-              onClick={() => handleTagToggle(tag)}
-              aria-pressed={selectedTags.includes(tag)}
-              type="button"
-            >
-              {tag}
-            </button>
-          ))}
+      <div className="puzzle-grid-header-section">
+        <h1>Emoji Puzzles</h1>
+        
+        {/* Search and Filter Section */}
+        <div className="puzzle-grid-controls">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search puzzles..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
+          <div className="tag-filter">
+            <div className="tag-filter-list">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  className={`tag-filter-item${
+                    selectedTags.includes(tag) ? " selected" : ""
+                  }`}
+                  onClick={() => handleTagToggle(tag)}
+                  onMouseUp={(e) => e.currentTarget.blur()}
+                  aria-pressed={selectedTags.includes(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="puzzle-grid-table">
-        <div className="puzzle-grid-header">
-          <div>Type & Tags</div>
-          <div>Guess</div>
-          <div>Hint</div>
-        </div>
+
+      <div className="puzzle-cards">
         {puzzles.map((puzzle) => (
-          <div className="puzzle-grid-row" key={puzzle.id}>
+          <div className="puzzle-card" key={puzzle.id}>
+            {/* Puzzle Display */}
+            <div className="puzzle-card-emoji">
+              {puzzle.emojis}
+            </div>
+            
             {/* Metadata */}
-            <div className="puzzle-grid-meta">
-              <div>
-                <span className="meta-label">Type: </span>
-                <span className="meta-type">
-                  {puzzle.type === "Phonetic"
-                    ? "🔤 Phonetic"
-                    : puzzle.type === "Symbolic"
-                    ? "🧩 Symbolic"
-                    : "📝 Other"}
+            <div className="puzzle-card-meta">
+              <div className="puzzle-type">
+                Type: <span className="emoji">
+                  {puzzle.type === "Phonetic" 
+                    ? "🔤"
+                    : puzzle.type === "Symbolic" 
+                    ? "🧩"
+                    : "📝"}
                 </span>
+                {puzzle.type}
               </div>
-              <div>
-                <span className="meta-label">Tags: </span>
-                {(puzzle.tags || []).map((tag) => (
-                  <span className="puzzle-grid-tag" key={tag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {puzzle.tags?.length > 0 && (
+                <div className="puzzle-tags">
+                  Tags: {puzzle.tags.map((tag, index) => (
+                    <span 
+                      key={tag} 
+                      className="puzzle-tag"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Guess input/submit/result */}
-            <div className="puzzle-grid-guess">
+            {/* Guess Section */}
+            <div className="puzzle-card-input">
               <input
                 type="text"
                 value={guesses[puzzle.id] || ""}
                 onChange={(e) => handleInputChange(puzzle.id, e.target.value)}
-                placeholder="Your guess..."
+                placeholder="Your answer..."
+                className="guess-input"
               />
               <button
-                onClick={() =>
-                  handleGuess(puzzle.id, guesses[puzzle.id] || "")
-                }
+                onClick={() => handleGuess(puzzle.id, guesses[puzzle.id] || "")}
+                className="submit-button"
               >
                 Submit
               </button>
-              <div className="puzzle-grid-result">{results[puzzle.id]}</div>
             </div>
 
-            {/* Hint */}
-            <div className="puzzle-grid-hint">
+            {/* Result */}
+            {results[puzzle.id] && (
+              <div className={`puzzle-result ${results[puzzle.id].startsWith("✅") ? "correct" : "incorrect"}`}>
+                {results[puzzle.id]}
+              </div>
+            )}
+
+            {/* Hint Section */}
+            <div className="puzzle-card-hint">
               <button
-                className="hint-btn"
+                className="hint-button"
                 onClick={() => handleShowHint(puzzle.id)}
               >
                 {showHints[puzzle.id] ? "Hide Hint" : "Show Hint"}
               </button>
               {showHints[puzzle.id] && (
-                <div className="puzzle-grid-hint-text">{puzzle.hint}</div>
+                <div className="hint-text">{puzzle.hint}</div>
               )}
-            </div>
-
-            {/* Emoji (puzzle) always full row, always big and centered */}
-            <div className="puzzle-grid-emoji-full">
-              <div className="puzzle-label">
-                <strong>Puzzle</strong>
-              </div>
-              <div className="puzzle-grid-emoji">{puzzle.emojis}</div>
             </div>
           </div>
         ))}
