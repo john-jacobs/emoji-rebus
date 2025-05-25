@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import { markPuzzleAsCompleted, isPuzzleCompleted } from "./utils/storage";
 
 export default function PuzzleDetail() {
   const { id } = useParams();
@@ -10,6 +11,7 @@ export default function PuzzleDetail() {
   const [result, setResult] = useState("");
   const [showHint, setShowHint] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     const fetchPuzzle = async () => {
@@ -24,6 +26,7 @@ export default function PuzzleDetail() {
         navigate("/");
       } else {
         setPuzzle(data);
+        setIsCompleted(isPuzzleCompleted(data.id));
         setLoading(false);
       }
     };
@@ -63,6 +66,8 @@ export default function PuzzleDetail() {
       normalizedGuess === correctAnswer ||
       levenshtein(normalizedGuess, correctAnswer) <= 2
     ) {
+      markPuzzleAsCompleted(puzzle.id);
+      setIsCompleted(true);
       setResult(`✅ Correct! The answer is: "${puzzle.answer}"`);
     } else {
       setResult("❌ Try Again");
@@ -78,7 +83,13 @@ export default function PuzzleDetail() {
         ← Back to All Puzzles
       </button>
 
-      <div className="puzzle-detail-content">
+      <div className={`puzzle-detail-content${isCompleted ? " completed" : ""}`}>
+        {isCompleted && (
+          <div className="completion-badge detail">
+            ✓ Solved
+          </div>
+        )}
+
         {/* Metadata */}
         <div className="puzzle-detail-meta">
           <div className="puzzle-type">
@@ -108,19 +119,21 @@ export default function PuzzleDetail() {
         </div>
 
         {/* Input Section */}
-        <div className="puzzle-detail-input">
-          <input
-            type="text"
-            value={guess}
-            onChange={(e) => setGuess(e.target.value)}
-            placeholder="Your answer..."
-            className="guess-input"
-            onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
-          />
-          <button onClick={handleSubmit} className="submit-button">
-            Submit
-          </button>
-        </div>
+        {!isCompleted && (
+          <div className="puzzle-detail-input">
+            <input
+              type="text"
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder="Your answer..."
+              className="guess-input"
+              onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
+            />
+            <button onClick={handleSubmit} className="submit-button">
+              Submit
+            </button>
+          </div>
+        )}
 
         {/* Result */}
         {result && (
@@ -130,17 +143,19 @@ export default function PuzzleDetail() {
         )}
 
         {/* Hint Section */}
-        <div className="puzzle-detail-hint">
-          <button
-            className="hint-button"
-            onClick={() => setShowHint(!showHint)}
-          >
-            {showHint ? "Hide Hint" : "Show Hint"}
-          </button>
-          {showHint && puzzle.hint && (
-            <div className="hint-text">{puzzle.hint}</div>
-          )}
-        </div>
+        {!isCompleted && (
+          <div className="puzzle-detail-hint">
+            <button
+              className="hint-button"
+              onClick={() => setShowHint(!showHint)}
+            >
+              {showHint ? "Hide Hint" : "Show Hint"}
+            </button>
+            {showHint && puzzle.hint && (
+              <div className="hint-text">{puzzle.hint}</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
