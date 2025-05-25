@@ -430,7 +430,7 @@ button:focus {
 .completion-badge.detail {
   top: 1rem;
   right: 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   padding: 0.35rem 1rem;
 }
 
@@ -752,6 +752,7 @@ input:focus, button:focus {
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(23, 38, 77, 0.08);
   overflow: hidden;
+  position: relative;
 }
 
 .puzzle-detail-meta {
@@ -780,29 +781,37 @@ input:focus, button:focus {
 
 .puzzle-detail-input {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin-bottom: 1rem;
+  align-items: flex-start;
 }
 
 .puzzle-detail-input .guess-input {
   flex: 1;
-  padding: 0.8rem 1rem;
+  padding: 12px 16px;
   font-size: 1rem;
   border: 2px solid #f7b801;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   background: #fffdfa;
+  box-sizing: border-box;
+  height: auto;
+  line-height: normal;
 }
 
 .puzzle-detail-input .submit-button {
-  padding: 0.8rem 1.5rem;
+  padding: 12px 24px;
   font-size: 1rem;
   background: #17264d;
   color: #fffdfa;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
+  margin: 0;
+  white-space: nowrap;
+  height: auto;
+  line-height: normal;
 }
 
 .puzzle-detail-input .submit-button:hover {
@@ -843,7 +852,172 @@ input:focus, button:focus {
   .puzzle-detail-input .guess-input,
   .puzzle-detail-input .submit-button {
     width: 100%;
-    padding: 0.7rem 1rem;
+  }
+}
+
+/* ---- CREATE PUZZLE FORM ---- */
+.create-puzzle-title {
+  font-size: 1.8rem;
+  color: #17264d;
+  margin: 0 0 2rem;
+  text-align: center;
+}
+
+.create-puzzle-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  align-items: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: center;
+  width: 100%;
+  align-items: center;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #17264d;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.hint-label, .optional-label {
+  color: #666;
+  font-size: 1rem;
+  font-weight: normal;
+  margin-left: 0.3rem;
+}
+
+.type-options {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.type-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 0.8rem;
+  transition: all 0.2s;
+}
+
+.type-option:hover {
+  background: rgba(247, 184, 1, 0.1);
+}
+
+.type-option input[type="radio"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: #f7b801;
+}
+
+.type-option input[type="radio"]:checked + .type-label {
+  color: #17264d;
+  font-weight: 600;
+}
+
+.type-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.type-emoji {
+  font-size: 1.4rem;
+}
+
+.form-input {
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #f7b801;
+  border-radius: 1.2rem;
+  background: #fffdfa;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  text-align: center;
+  color: #666;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #17264d;
+  box-shadow: 0 2px 8px rgba(23, 38, 77, 0.1);
+}
+
+.emoji-input {
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  padding: 1.2rem 1rem;
+}
+
+.create-submit {
+  margin-top: 1rem;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: 1.2rem;
+  max-width: 480px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .create-puzzle-title {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .type-options {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 0.5rem 1rem;
+  }
+
+  .type-option {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .form-input {
+    max-width: 100%;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .emoji-input {
+    font-size: 1.4rem;
+    padding: 1rem;
+  }
+
+  .form-label {
+    font-size: 1.1rem;
+  }
+
+  .create-submit {
+    max-width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
   }
 }
 

@@ -1,7 +1,7 @@
 // src/SubmitPuzzle.js
 import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
-import logo from './logo-transparent.png';
+import { useNavigate } from 'react-router-dom';
 
 export default function SubmitPuzzle() {
   const [emojis, setEmojis] = useState('');
@@ -10,6 +10,7 @@ export default function SubmitPuzzle() {
   const [tags, setTags] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,88 +39,152 @@ export default function SubmitPuzzle() {
       setStatus(`❌ Error: ${error.message}`);
     } else {
       setStatus('✅ Puzzle submitted!');
+      // Clear form after successful submission
       setEmojis('');
       setAnswer('');
       setHint('');
       setTags('');
       setType('');
+      
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     }
   };
 
   return (
-    <div className="submit-form">
-      <header className="logo-header">
-        <img src={logo} alt="EmojiCode logo" className="logo-large" />
-      </header>
-      <h2>Submit an EmojiCode</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Puzzle Type: <span style={{ color: "#d33" }}>*</span></label>
-          <div>
-            <label>
-              <input
-                type="radio"
-                name="puzzleType"
-                value="Phonetic"
-                checked={type === 'Phonetic'}
-                onChange={() => setType('Phonetic')}
-                required
-              />
-              Phonetic (sound-based)
+    <div className="puzzle-detail">
+      <button className="back-button" onClick={() => navigate("/")}>
+        ← Back to All Puzzles
+      </button>
+
+      <div className="puzzle-detail-content">
+        <h1 className="create-puzzle-title">Create New Puzzle</h1>
+        
+        <form onSubmit={handleSubmit} className="create-puzzle-form">
+          {/* Puzzle Type Selection */}
+          <div className="form-group">
+            <label className="form-label">
+              Puzzle Type <span className="required">*</span>
             </label>
-            <label style={{ marginLeft: '1.2rem' }}>
-              <input
-                type="radio"
-                name="puzzleType"
-                value="Symbolic"
-                checked={type === 'Symbolic'}
-                onChange={() => setType('Symbolic')}
-                required
-              />
-              Symbolic (concept-based)
-            </label>
-            <label style={{ marginLeft: '1.2rem' }}>
-              <input
-                type="radio"
-                name="puzzleType"
-                value="Other"
-                checked={type === 'Other'}
-                onChange={() => setType('Other')}
-                required
-              />
-              Other
-            </label>
+            <div className="type-options">
+              <label className="type-option">
+                <input
+                  type="radio"
+                  name="puzzleType"
+                  value="Phonetic"
+                  checked={type === 'Phonetic'}
+                  onChange={() => setType('Phonetic')}
+                  required
+                />
+                <span className="type-label">
+                  <span className="type-emoji">🔤</span>
+                  Phonetic
+                </span>
+              </label>
+              <label className="type-option">
+                <input
+                  type="radio"
+                  name="puzzleType"
+                  value="Symbolic"
+                  checked={type === 'Symbolic'}
+                  onChange={() => setType('Symbolic')}
+                  required
+                />
+                <span className="type-label">
+                  <span className="type-emoji">🧩</span>
+                  Symbolic
+                </span>
+              </label>
+              <label className="type-option">
+                <input
+                  type="radio"
+                  name="puzzleType"
+                  value="Other"
+                  checked={type === 'Other'}
+                  onChange={() => setType('Other')}
+                  required
+                />
+                <span className="type-label">
+                  <span className="type-emoji">📝</span>
+                  Other
+                </span>
+              </label>
+            </div>
           </div>
-        </div>
-        <input
-          type="text"
-          placeholder="Emoji puzzle (e.g. 🐝➕🎶)"
-          value={emojis}
-          onChange={(e) => setEmojis(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Answer (e.g. be positive)"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Hint (optional)"
-          value={hint}
-          onChange={(e) => setHint(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Tags (comma-separated, e.g. music, phrase)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-        />
-        <button type="submit">Submit Puzzle</button>
-      </form>
-      <p>{status}</p>
+
+          {/* Emoji Input */}
+          <div className="form-group">
+            <label className="form-label">
+              Emoji Puzzle <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-input emoji-input"
+              placeholder="Enter emojis (e.g. 🐝➕🎶)"
+              value={emojis}
+              onChange={(e) => setEmojis(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Answer Input */}
+          <div className="form-group">
+            <label className="form-label">
+              Answer <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter answer (e.g. be positive)"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Hint Input */}
+          <div className="form-group">
+            <label className="form-label">
+              Hint <span className="optional-label">(optional)</span>
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter a helpful hint"
+              value={hint}
+              onChange={(e) => setHint(e.target.value)}
+            />
+          </div>
+
+          {/* Tags Input */}
+          <div className="form-group">
+            <label className="form-label">
+              Tags <span className="optional-label">(optional)</span>
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter tags, separated by commas (e.g. music, phrase)"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button type="submit" className="submit-button create-submit">
+            Create Puzzle
+          </button>
+        </form>
+
+        {/* Status Message */}
+        {status && (
+          <div className={`puzzle-result ${status.startsWith("✅") ? "correct" : "incorrect"}`}>
+            {status}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
