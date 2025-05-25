@@ -6,11 +6,28 @@ import { useNavigate } from 'react-router-dom';
 export default function SubmitPuzzle() {
   const [emojis, setEmojis] = useState('');
   const [answer, setAnswer] = useState('');
-  const [hint, setHint] = useState('');
+  const [hints, setHints] = useState(['']); // Initialize with one empty hint
   const [tags, setTags] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
   const navigate = useNavigate();
+
+  const handleHintChange = (index, value) => {
+    const newHints = [...hints];
+    newHints[index] = value;
+    setHints(newHints);
+  };
+
+  const addHint = () => {
+    setHints([...hints, '']);
+  };
+
+  const removeHint = (index) => {
+    if (hints.length > 1) {
+      const newHints = hints.filter((_, i) => i !== index);
+      setHints(newHints);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,36 +37,39 @@ export default function SubmitPuzzle() {
       return;
     }
 
+    // Filter out empty hints
+    const filteredHints = hints.filter(hint => hint.trim() !== '');
     const tagArray = tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('puzzles')
       .insert([
         {
           emojis,
           answer: answer.toLowerCase().trim(),
-          hint,
+          hints: filteredHints,
           tags: tagArray,
           created_by: null,
           type
         }
-      ]);
+      ])
+      .select();
 
     if (error) {
       setStatus(`❌ Error: ${error.message}`);
     } else {
-      setStatus('✅ Puzzle submitted!');
-      // Clear form after successful submission
+      setStatus('✅ Puzzle created! Redirecting...');
       setEmojis('');
       setAnswer('');
-      setHint('');
+      setHints(['']);
       setTags('');
       setType('');
       
-      // Redirect to home page after a short delay
+      // Navigate to the puzzle detail page using the newly created puzzle's ID
+      const newPuzzleId = data[0].id;
       setTimeout(() => {
-        navigate('/');
-      }, 1500);
+        navigate(`/puzzle/${newPuzzleId}`);
+      }, 1000);
     }
   };
 
@@ -144,18 +164,41 @@ export default function SubmitPuzzle() {
             />
           </div>
 
-          {/* Hint Input */}
+          {/* Hints Input */}
           <div className="form-group">
             <label className="form-label">
-              Hint <span className="optional-label">(optional)</span>
+              Hints <span className="optional-label">(optional)</span>
             </label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Enter a helpful hint"
-              value={hint}
-              onChange={(e) => setHint(e.target.value)}
-            />
+            <div className="hints-container">
+              {hints.map((hint, index) => (
+                <div key={index} className="hint-input-group">
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder={`Hint ${index + 1}`}
+                    value={hint}
+                    onChange={(e) => handleHintChange(index, e.target.value)}
+                  />
+                  {hints.length > 1 && (
+                    <button
+                      type="button"
+                      className="hint-remove-button"
+                      onClick={() => removeHint(index)}
+                      aria-label="Remove hint"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                className="hint-add-button"
+                onClick={addHint}
+              >
+                + Add Another Hint
+              </button>
+            </div>
           </div>
 
           {/* Tags Input */}

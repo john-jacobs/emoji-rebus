@@ -9,7 +9,7 @@ export default function PuzzleDetail() {
   const [puzzle, setPuzzle] = useState(null);
   const [guess, setGuess] = useState("");
   const [result, setResult] = useState("");
-  const [showHint, setShowHint] = useState(false);
+  const [shownHints, setShownHints] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -82,9 +82,15 @@ export default function PuzzleDetail() {
     const normalizedGuess = guess.trim().toLowerCase();
     const correctAnswer = puzzle.answer.trim().toLowerCase();
 
+    // Remove "the " from both strings for comparison
+    const normalizedGuessNoThe = normalizedGuess.replace(/^the\s+/, '');
+    const correctAnswerNoThe = correctAnswer.replace(/^the\s+/, '');
+
     if (
       normalizedGuess === correctAnswer ||
-      levenshtein(normalizedGuess, correctAnswer) <= 2
+      normalizedGuessNoThe === correctAnswerNoThe ||
+      levenshtein(normalizedGuess, correctAnswer) <= 2 ||
+      levenshtein(normalizedGuessNoThe, correctAnswerNoThe) <= 2
     ) {
       markPuzzleAsCompleted(puzzle.id);
       setIsCompleted(true);
@@ -94,10 +100,22 @@ export default function PuzzleDetail() {
     }
   };
 
+  const toggleHint = (index) => {
+    setShownHints(prev => {
+      const newShown = new Set(prev);
+      if (newShown.has(index)) {
+        newShown.delete(index);
+      } else {
+        newShown.add(index);
+      }
+      return newShown;
+    });
+  };
+
   if (loading) return <div className="puzzle-detail-loading">Loading puzzle...</div>;
   if (!puzzle) return <div className="puzzle-detail-error">Puzzle not found</div>;
 
-  const emojiSize = calculateEmojiSize(600, puzzle.emojis); // 600px is approximate detail width
+  const emojiSize = calculateEmojiSize(600, puzzle.emojis);
 
   return (
     <div className="puzzle-detail">
@@ -143,6 +161,32 @@ export default function PuzzleDetail() {
           {puzzle.emojis}
         </div>
 
+        {/* Solved State Information */}
+        {isCompleted && (
+          <div className="puzzle-solved-info">
+            <div className="puzzle-answer">
+              <h3>Answer</h3>
+              <p>{puzzle.answer}</p>
+            </div>
+            {puzzle.explanation && (
+              <div className="puzzle-explanation">
+                <h3>Explanation</h3>
+                <p>{puzzle.explanation}</p>
+              </div>
+            )}
+            {puzzle.hints?.length > 0 && (
+              <div className="puzzle-all-hints">
+                <h3>Hints</h3>
+                {puzzle.hints.map((hint, index) => (
+                  <div key={index} className="hint-text">
+                    {hint}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Input Section */}
         {!isCompleted && (
           <div className="puzzle-detail-input">
@@ -167,18 +211,22 @@ export default function PuzzleDetail() {
           </div>
         )}
 
-        {/* Hint Section */}
-        {!isCompleted && (
-          <div className="puzzle-detail-hint">
-            <button
-              className="hint-button"
-              onClick={() => setShowHint(!showHint)}
-            >
-              {showHint ? "Hide Hint" : "Show Hint"}
-            </button>
-            {showHint && puzzle.hint && (
-              <div className="hint-text">{puzzle.hint}</div>
-            )}
+        {/* Hints Section - Only show when not completed */}
+        {!isCompleted && puzzle.hints?.length > 0 && (
+          <div className="puzzle-detail-hints">
+            {puzzle.hints.map((hint, index) => (
+              <div key={index} className="hint-section">
+                <button
+                  className="hint-button"
+                  onClick={() => toggleHint(index)}
+                >
+                  {shownHints.has(index) ? `Hide Hint ${index + 1}` : `Show Hint ${index + 1}`}
+                </button>
+                {shownHints.has(index) && (
+                  <div className="hint-text">{hint}</div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
