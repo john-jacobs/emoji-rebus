@@ -68,13 +68,9 @@ function PuzzleCard({ puzzle }) {
           </span>
           {puzzle.type}
         </div>
-        {puzzle.tags?.length > 0 && (
-          <div className="puzzle-tags">
-            Tags: {puzzle.tags.map((tag) => (
-              <span key={tag} className="puzzle-tag">
-                {tag}
-              </span>
-            ))}
+        {puzzle.categories && (
+          <div className="puzzle-category">
+            Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
           </div>
         )}
       </div>
@@ -117,35 +113,45 @@ function PuzzleCard({ puzzle }) {
 export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
   const [puzzles, setPuzzles] = useState([]);
   const [allPuzzles, setAllPuzzles] = useState([]);
-  const [tags, setTags] = useState([]);
   const [completionFilter, setCompletionFilter] = useState('all');
   const [completionStats, setCompletionStats] = useState({ solved: 0, total: 0 });
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchPuzzles = async () => {
-      const { data, error } = await supabase
+      // First fetch categories
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (categoryError) {
+        console.error('Error fetching categories:', categoryError);
+      } else if (categoryData) {
+        setCategories(categoryData);
+      }
+
+      // Then fetch puzzles with category names
+      const { data: puzzleData, error: puzzleError } = await supabase
         .from("puzzles")
-        .select("*")
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `)
         .order("created_at", { ascending: false });
-      if (!error && data) {
-        setAllPuzzles(data);
-        setPuzzles(data);
+
+      if (!puzzleError && puzzleData) {
+        setAllPuzzles(puzzleData);
+        setPuzzles(puzzleData);
 
         // Calculate completion stats
-        const solved = data.filter(puzzle => isPuzzleCompleted(puzzle.id)).length;
+        const solved = puzzleData.filter(puzzle => isPuzzleCompleted(puzzle.id)).length;
         setCompletionStats({
           solved,
-          total: data.length
+          total: puzzleData.length
         });
-
-        // Extract unique tags
-        const tagSet = new Set();
-        data.forEach((p) => {
-          if (Array.isArray(p.tags)) {
-            p.tags.forEach((tag) => tagSet.add(tag));
-          }
-        });
-        setTags(Array.from(tagSet).sort());
       }
     };
     fetchPuzzles();
@@ -156,7 +162,7 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
     
     if (selectedTags.length > 0) {
       filtered = filtered.filter((p) =>
-        Array.isArray(p.tags) && p.tags.some((tag) => selectedTags.includes(tag))
+        selectedTags.includes(p.category)
       );
     }
 
@@ -170,9 +176,9 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
     setPuzzles(filtered);
   }, [selectedTags, allPuzzles, completionFilter]);
 
-  const handleTagToggle = (tag) => {
+  const handleCategoryToggle = (categoryId) => {
     setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(categoryId) ? prev.filter((t) => t !== categoryId) : [...prev, categoryId]
     );
   };
 
@@ -215,17 +221,17 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
           <h1>Emoji Puzzles</h1>
           <div className="puzzle-grid-controls">
             {renderCompletionFilter()}
-            <div className="tag-filter">
-              <div className="tag-filter-list">
-                {tags.map((tag) => (
+            <div className="category-filter">
+              <div className="category-filter-list">
+                {categories.map((category) => (
                   <button
-                    key={tag}
-                    className={`tag-filter-item${selectedTags.includes(tag) ? " selected" : ""}`}
-                    onClick={() => handleTagToggle(tag)}
+                    key={category.id}
+                    className={`category-filter-item${selectedTags.includes(category.id) ? " selected" : ""}`}
+                    onClick={() => handleCategoryToggle(category.id)}
                     onMouseUp={(e) => e.currentTarget.blur()}
-                    aria-pressed={selectedTags.includes(tag)}
+                    aria-pressed={selectedTags.includes(category.id)}
                   >
-                    {tag}
+                    {category.name}
                   </button>
                 ))}
               </div>
@@ -243,17 +249,17 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
         <h1>Emoji Puzzles</h1>
         <div className="puzzle-grid-controls">
           {renderCompletionFilter()}
-          <div className="tag-filter">
-            <div className="tag-filter-list">
-              {tags.map((tag) => (
+          <div className="category-filter">
+            <div className="category-filter-list">
+              {categories.map((category) => (
                 <button
-                  key={tag}
-                  className={`tag-filter-item${selectedTags.includes(tag) ? " selected" : ""}`}
-                  onClick={() => handleTagToggle(tag)}
+                  key={category.id}
+                  className={`category-filter-item${selectedTags.includes(category.id) ? " selected" : ""}`}
+                  onClick={() => handleCategoryToggle(category.id)}
                   onMouseUp={(e) => e.currentTarget.blur()}
-                  aria-pressed={selectedTags.includes(tag)}
+                  aria-pressed={selectedTags.includes(category.id)}
                 >
-                  {tag}
+                  {category.name}
                 </button>
               ))}
             </div>

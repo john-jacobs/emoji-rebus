@@ -37,7 +37,12 @@ export default function PuzzleDetail() {
     const fetchPuzzle = async () => {
       const { data, error } = await supabase
         .from("puzzles")
-        .select("*")
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `)
         .eq("id", id)
         .single();
 
@@ -142,13 +147,9 @@ export default function PuzzleDetail() {
             </span>
             {puzzle.type}
           </div>
-          {puzzle.tags?.length > 0 && (
-            <div className="puzzle-tags">
-              Tags: {puzzle.tags.map((tag, index) => (
-                <span key={tag} className="puzzle-tag">
-                  {tag}
-                </span>
-              ))}
+          {puzzle.categories && (
+            <div className="puzzle-category">
+              Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
 // src/SubmitPuzzle.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,10 +7,28 @@ export default function SubmitPuzzle() {
   const [emojis, setEmojis] = useState('');
   const [answer, setAnswer] = useState('');
   const [hints, setHints] = useState(['']); // Initialize with one empty hint
-  const [tags, setTags] = useState('');
+  const [category, setCategory] = useState('');
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching categories:', error);
+      } else if (data) {
+        setCategories(data);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleHintChange = (index, value) => {
     const newHints = [...hints];
@@ -37,9 +55,13 @@ export default function SubmitPuzzle() {
       return;
     }
 
+    if (!category) {
+      setStatus('❌ Please select a category.');
+      return;
+    }
+
     // Filter out empty hints
     const filteredHints = hints.filter(hint => hint.trim() !== '');
-    const tagArray = tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
 
     const { data, error } = await supabase
       .from('puzzles')
@@ -48,7 +70,7 @@ export default function SubmitPuzzle() {
           emojis,
           answer: answer.toLowerCase().trim(),
           hints: filteredHints,
-          tags: tagArray,
+          category,
           created_by: null,
           type
         }
@@ -62,7 +84,7 @@ export default function SubmitPuzzle() {
       setEmojis('');
       setAnswer('');
       setHints(['']);
-      setTags('');
+      setCategory('');
       setType('');
       
       // Navigate to the puzzle detail page using the newly created puzzle's ID
@@ -164,6 +186,26 @@ export default function SubmitPuzzle() {
             />
           </div>
 
+          {/* Category Selection */}
+          <div className="form-group">
+            <label className="form-label">
+              Category <span className="required">*</span>
+            </label>
+            <select
+              className="form-input"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Hints Input */}
           <div className="form-group">
             <label className="form-label">
@@ -199,20 +241,6 @@ export default function SubmitPuzzle() {
                 + Add Another Hint
               </button>
             </div>
-          </div>
-
-          {/* Tags Input */}
-          <div className="form-group">
-            <label className="form-label">
-              Tags <span className="optional-label">(optional)</span>
-            </label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Enter tags, separated by commas (e.g. music, phrase)"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-            />
           </div>
 
           {/* Submit Button */}
