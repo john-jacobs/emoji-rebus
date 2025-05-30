@@ -35,27 +35,31 @@ export default function PuzzleDetail() {
 
   useEffect(() => {
     const fetchPuzzle = async () => {
-      const { data, error } = await supabase
-        .from("puzzles")
-        .select(`
-          *,
-          categories (
-            name
-          ),
-          profiles:created_by (
-            email
-          )
-        `)
-        .eq("id", id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("puzzles")
+          .select(`
+            *,
+            categories (
+              name
+            )
+          `)
+          .eq("id", id)
+          .single();
 
-      if (error) {
-        console.error("Error fetching puzzle:", error);
-        navigate("/");
-      } else {
+        if (error) {
+          console.error("Error fetching puzzle:", error);
+          navigate("/");
+          return;
+        }
+
         setPuzzle(data);
         const completed = await isPuzzleCompleted(data.id);
         setIsCompleted(completed);
+      } catch (error) {
+        console.error("Error in fetchPuzzle:", error);
+        navigate("/");
+      } finally {
         setLoading(false);
       }
     };
@@ -154,13 +158,6 @@ export default function PuzzleDetail() {
           {puzzle.categories && (
             <div className="puzzle-category">
               Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
-            </div>
-          )}
-          {puzzle.profiles && (
-            <div className="puzzle-creator">
-              Created by: <span className="puzzle-creator-text">
-                {puzzle.profiles.email.split('@')[0]}
-              </span>
             </div>
           )}
         </div>

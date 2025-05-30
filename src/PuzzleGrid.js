@@ -3,26 +3,7 @@ import { supabase } from "./supabaseClient";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
 import { getCompletedPuzzles } from "./utils/completedPuzzles";
-
-// Function to calculate emoji font size
-const calculateEmojiSize = (containerWidth, emojiString) => {
-  const baseSize = 40; // Base font size in pixels
-  const minSize = 16; // Minimum font size
-  const emojiCount = Array.from(emojiString).length;
-  const spacing = 0.1; // Letter spacing in em
-  
-  // Calculate the total width needed at base size
-  const totalWidthNeeded = baseSize * emojiCount * (1 + spacing);
-  
-  // If it fits, use base size
-  if (totalWidthNeeded <= containerWidth) {
-    return baseSize;
-  }
-  
-  // Otherwise, scale down proportionally
-  const scaledSize = Math.max(minSize, (containerWidth / emojiCount) / (1 + spacing));
-  return scaledSize;
-};
+import { calculateEmojiSize } from "./utils/emojiUtils";
 
 function PuzzleCard({ puzzle, completedPuzzleIds }) {
   const navigate = useNavigate();
@@ -31,11 +12,14 @@ function PuzzleCard({ puzzle, completedPuzzleIds }) {
   const emojiSize = calculateEmojiSize(300, puzzle.emojis);
 
   const handleClick = (e) => {
-    if (e.target.closest('.solution-toggle') || e.target.closest('.puzzle-card-content')) {
+    if (e.target.tagName.toLowerCase() === 'button' || 
+        e.target.closest('.puzzle-card-content') ||
+        e.target.closest('.solution-toggle')) {
       e.stopPropagation();
-    } else {
-      navigate(`/puzzle/${puzzle.id}`);
+      return;
     }
+    
+    navigate(`/puzzle/${puzzle.id}`);
   };
 
   return (

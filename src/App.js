@@ -8,6 +8,8 @@ import PuzzleDetail from "./PuzzleDetail";
 import Auth from "./components/Auth";
 import "./App.css";
 import logo from "./logo-transparent.png";
+import MyPuzzles from "./MyPuzzles";
+import EditPuzzle from "./EditPuzzle";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -46,6 +48,7 @@ function App() {
             <Link to="/">All Puzzles</Link>
             {session ? (
               <>
+                <Link to="/my-puzzles">My Puzzles</Link>
                 <Link to="/submit">Create</Link>
                 <button 
                   onClick={() => supabase.auth.signOut()}
@@ -91,6 +94,26 @@ function App() {
                 <Auth />
               ) : (
                 <Navigate to="/" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/my-puzzles" 
+            element={
+              session ? (
+                <MyPuzzles />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/edit-puzzle/:id" 
+            element={
+              session ? (
+                <EditPuzzle />
+              ) : (
+                <Navigate to="/login" replace />
               )
             } 
           />
