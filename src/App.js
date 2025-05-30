@@ -1,14 +1,39 @@
 // File: src/App.js
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 import SubmitPuzzle from "./SubmitPuzzle";
 import PuzzleGrid from "./PuzzleGrid";
 import PuzzleDetail from "./PuzzleDetail";
+import Auth from "./components/Auth";
 import "./App.css";
 import logo from "./logo-transparent.png";
 
 function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState([]);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
@@ -19,9 +44,22 @@ function App() {
           </Link>
           <div className="nav-links">
             <Link to="/">All Puzzles</Link>
-            <Link to="/submit">Create</Link>
+            {session ? (
+              <>
+                <Link to="/submit">Create</Link>
+                <button 
+                  onClick={() => supabase.auth.signOut()}
+                  className="nav-button"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link to="/login">Sign In</Link>
+            )}
           </div>
         </nav>
+
         <Routes>
           <Route 
             path="/" 
@@ -36,7 +74,26 @@ function App() {
             path="/puzzle/:id" 
             element={<PuzzleDetail />} 
           />
-          <Route path="/submit" element={<SubmitPuzzle />} />
+          <Route 
+            path="/submit" 
+            element={
+              session ? (
+                <SubmitPuzzle />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/login" 
+            element={
+              !session ? (
+                <Auth />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            } 
+          />
         </Routes>
       </div>
     </Router>
