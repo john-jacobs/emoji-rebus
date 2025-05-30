@@ -41,6 +41,9 @@ export default function PuzzleDetail() {
           *,
           categories (
             name
+          ),
+          profiles:created_by (
+            email
           )
         `)
         .eq("id", id)
@@ -51,7 +54,8 @@ export default function PuzzleDetail() {
         navigate("/");
       } else {
         setPuzzle(data);
-        setIsCompleted(isPuzzleCompleted(data.id));
+        const completed = await isPuzzleCompleted(data.id);
+        setIsCompleted(completed);
         setLoading(false);
       }
     };
@@ -150,6 +154,13 @@ export default function PuzzleDetail() {
           {puzzle.categories && (
             <div className="puzzle-category">
               Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
+            </div>
+          )}
+          {puzzle.profiles && (
+            <div className="puzzle-creator">
+              Created by: <span className="puzzle-creator-text">
+                {puzzle.profiles.email.split('@')[0]}
+              </span>
             </div>
           )}
         </div>

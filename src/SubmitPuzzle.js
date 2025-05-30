@@ -60,6 +60,14 @@ export default function SubmitPuzzle() {
       return;
     }
 
+    // Get the current user's session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setStatus('❌ You must be logged in to create puzzles.');
+      navigate('/login');
+      return;
+    }
+
     // Filter out empty hints
     const filteredHints = hints.filter(hint => hint.trim() !== '');
 
@@ -71,7 +79,7 @@ export default function SubmitPuzzle() {
           answer: answer.toLowerCase().trim(),
           hints: filteredHints,
           category,
-          created_by: null,
+          created_by: session.user.id,
           type
         }
       ])

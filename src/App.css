@@ -1462,3 +1462,23 @@ input:focus, button:focus {
   color: #d32f2f;
 }
 
+.puzzle-creator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.puzzle-creator-text {
+  color: #17264d;
+  font-weight: 500;
+}
+
+/* For the detail view */
+.puzzle-detail-meta .puzzle-creator {
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+

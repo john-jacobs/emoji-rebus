@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
-import { isPuzzleCompleted } from "./utils/storage";
+import { getCompletedPuzzles } from "./utils/completedPuzzles";
 
 // Function to calculate emoji font size
 const calculateEmojiSize = (containerWidth, emojiString) => {
@@ -24,10 +24,10 @@ const calculateEmojiSize = (containerWidth, emojiString) => {
   return scaledSize;
 };
 
-function PuzzleCard({ puzzle }) {
+function PuzzleCard({ puzzle, completedPuzzleIds }) {
   const navigate = useNavigate();
   const [showSolution, setShowSolution] = useState(false);
-  const isCompleted = isPuzzleCompleted(puzzle.id);
+  const isCompleted = completedPuzzleIds.includes(puzzle.id);
   const emojiSize = calculateEmojiSize(300, puzzle.emojis);
 
   const handleClick = (e) => {
@@ -73,6 +73,13 @@ function PuzzleCard({ puzzle }) {
             Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
           </div>
         )}
+        {puzzle.profiles && (
+          <div className="puzzle-creator">
+            Created by: <span className="puzzle-creator-text">
+              {puzzle.profiles.email.split('@')[0]}
+            </span>
+          </div>
+        )}
       </div>
 
       {isCompleted ? (
@@ -116,67 +123,79 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
   const [completionFilter, setCompletionFilter] = useState('all');
   const [completionStats, setCompletionStats] = useState({ solved: 0, total: 0 });
   const [categories, setCategories] = useState([]);
+  const [completedPuzzleIds, setCompletedPuzzleIds] = useState([]);
 
   useEffect(() => {
     const fetchPuzzles = async () => {
-      // First fetch categories
-      const { data: categoryData, error: categoryError } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
+      try {
+        // First fetch categories
+        const { data: categoryData, error: categoryError } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name');
 
-      if (categoryError) {
-        console.error('Error fetching categories:', categoryError);
-      } else if (categoryData) {
+        if (categoryError) throw categoryError;
         setCategories(categoryData);
-      }
 
-      // Then fetch puzzles with category names
-      const { data: puzzleData, error: puzzleError } = await supabase
-        .from("puzzles")
-        .select(`
-          *,
-          categories (
-            name
-          )
-        `)
-        .order("created_at", { ascending: false });
+        // Then fetch puzzles with categories
+        const { data: puzzleData, error: puzzleError } = await supabase
+          .from("puzzles")
+          .select(`
+            *,
+            categories (
+              id,
+              name
+            )
+          `)
+          .order("created_at", { ascending: false });
 
-      if (!puzzleError && puzzleData) {
+        if (puzzleError) throw puzzleError;
+
+        // Get completed puzzles
+        const completed = await getCompletedPuzzles();
+        setCompletedPuzzleIds(completed);
+        
         setAllPuzzles(puzzleData);
         setPuzzles(puzzleData);
-
-        // Calculate completion stats
-        const solved = puzzleData.filter(puzzle => isPuzzleCompleted(puzzle.id)).length;
+        
         setCompletionStats({
-          solved,
+          solved: completed.length,
           total: puzzleData.length
         });
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+
     fetchPuzzles();
   }, []);
 
+  // Filtering effect
   useEffect(() => {
     let filtered = [...allPuzzles];
     
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter((p) =>
-        selectedTags.includes(p.category)
-      );
-    }
-
-    if (completionFilter !== 'all') {
+    // Filter by category
+    if (selectedTags && selectedTags.length > 0) {
       filtered = filtered.filter((puzzle) => {
-        const completed = isPuzzleCompleted(puzzle.id);
-        return completionFilter === 'solved' ? completed : !completed;
+        // Check if the puzzle's category ID matches any selected tag
+        return selectedTags.includes(puzzle.categories?.id);
       });
     }
-    
-    setPuzzles(filtered);
-  }, [selectedTags, allPuzzles, completionFilter]);
 
+    // Filter by completion status
+    if (completionFilter !== 'all') {
+      filtered = filtered.filter((puzzle) => {
+        const isCompleted = completedPuzzleIds.includes(puzzle.id);
+        return completionFilter === 'solved' ? isCompleted : !isCompleted;
+      });
+    }
+
+    setPuzzles(filtered);
+  }, [allPuzzles, completionFilter, completedPuzzleIds, selectedTags]);
+
+  // Category toggle handler
   const handleCategoryToggle = (categoryId) => {
+    console.log("Toggling category:", categoryId);
     setSelectedTags((prev) =>
       prev.includes(categoryId) ? prev.filter((t) => t !== categoryId) : [...prev, categoryId]
     );
@@ -269,7 +288,11 @@ export default function PuzzleGrid({ selectedTags, setSelectedTags }) {
 
       <div className="puzzle-cards">
         {puzzles.map((puzzle) => (
-          <PuzzleCard key={puzzle.id} puzzle={puzzle} />
+          <PuzzleCard 
+            key={puzzle.id} 
+            puzzle={puzzle} 
+            completedPuzzleIds={completedPuzzleIds}
+          />
         ))}
       </div>
     </div>
