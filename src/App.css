@@ -774,46 +774,47 @@ input:focus, button:focus {
 
 /* Back button */
 .back-button {
-  background-color: #1a237e;
-  color: white;
-  padding: 12px 24px;
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 25px;
+  background: none;
+  color: #0066cc;
+  font-size: 1rem;
   cursor: pointer;
-  font-size: 16px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
+  text-decoration: underline;
 }
 
 /* Metadata section */
 .puzzle-metadata {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 20px 0;
-  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  text-align: center;
 }
 
 .metadata-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .metadata-label {
-  min-width: 100px;
-  font-weight: 500;
+  font-weight: bold;
   color: #666;
-  text-align: right;
 }
 
 .metadata-value {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.25rem;
+}
+
+.metadata-value .emoji {
+  margin-right: 0.25rem;
 }
 
 /* Emoji display */
