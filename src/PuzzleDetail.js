@@ -12,11 +12,14 @@ export default function PuzzleDetail() {
   const [shownHints, setShownHints] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // Function to calculate emoji font size
   const calculateEmojiSize = (containerWidth, emojiString) => {
-    const baseSize = 64; // Larger base size for detail view
-    const minSize = 24; // Larger minimum size for detail view
+    // Get the actual container width from the window
+    const viewportWidth = Math.min(window.innerWidth - 40, containerWidth); // 40px for padding
+    const baseSize = Math.min(64, viewportWidth / 8); // Adjust base size for mobile
+    const minSize = Math.min(24, viewportWidth / 16); // Adjust min size for mobile
     const emojiCount = Array.from(emojiString).length;
     const spacing = 0.1; // Letter spacing in em
     
@@ -24,13 +27,13 @@ export default function PuzzleDetail() {
     const totalWidthNeeded = baseSize * emojiCount * (1 + spacing);
     
     // If it fits, use base size
-    if (totalWidthNeeded <= containerWidth) {
+    if (totalWidthNeeded <= viewportWidth) {
       return baseSize;
     }
     
     // Otherwise, scale down proportionally
-    const scaledSize = Math.max(minSize, (containerWidth / emojiCount) / (1 + spacing));
-    return scaledSize;
+    const scaledSize = Math.max(minSize, (viewportWidth / emojiCount) / (1 + spacing));
+    return Math.floor(scaledSize); // Round down to prevent overflow
   };
 
   useEffect(() => {
@@ -66,6 +69,15 @@ export default function PuzzleDetail() {
 
     fetchPuzzle();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   function levenshtein(a, b) {
     if (a.length === 0) return b.length;
@@ -128,7 +140,7 @@ export default function PuzzleDetail() {
   if (loading) return <div className="puzzle-detail-loading">Loading puzzle...</div>;
   if (!puzzle) return <div className="puzzle-detail-error">Puzzle not found</div>;
 
-  const emojiSize = calculateEmojiSize(600, puzzle.emojis);
+  const emojiSize = calculateEmojiSize(windowWidth - 40, puzzle.emojis);
 
   return (
     <div className="puzzle-detail">
@@ -163,11 +175,16 @@ export default function PuzzleDetail() {
         </div>
 
         {/* Puzzle Display */}
-        <div 
-          className="puzzle-detail-emoji"
-          style={{ fontSize: `${emojiSize}px` }}
-        >
-          {puzzle.emojis}
+        <div className="puzzle-detail-emoji-container">
+          <div 
+            className="puzzle-detail-emoji"
+            style={{ 
+              fontSize: `${emojiSize}px`,
+              maxWidth: `${windowWidth - 40}px` // Account for padding
+            }}
+          >
+            {puzzle.emojis}
+          </div>
         </div>
 
         {/* Solved State Information */}
