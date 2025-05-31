@@ -78,7 +78,7 @@ export default function SubmitPuzzle() {
           emojis,
           answer: answer.toLowerCase().trim(),
           hints: filteredHints,
-          category,
+          category_id: category,
           created_by: session.user.id,
           type
         }

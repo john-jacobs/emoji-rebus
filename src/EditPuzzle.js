@@ -22,7 +22,13 @@ export default function EditPuzzle() {
       console.log("Fetching puzzle with ID:", id);
       const { data: puzzle, error } = await supabase
         .from("puzzles")
-        .select("*, categories(*)")
+        .select(`
+          *,
+          categories (
+            id,
+            name
+          )
+        `)
         .eq("id", id)
         .single();
 
