@@ -286,44 +286,88 @@ button:focus {
   margin-bottom: 1rem;
 }
 
+/* Filter section container */
 .completion-filter {
   display: flex;
-  gap: 10px;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 20px auto;
   flex-wrap: wrap;
   justify-content: center;
+  padding: 0 10px;
+  max-width: 100%;
 }
 
+/* Base filter button styles */
 .filter-button {
   padding: 8px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #FFD700;
   border-radius: 20px;
   background: white;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 100px;
   justify-content: center;
   transition: all 0.2s ease;
-  white-space: nowrap;
+  color: #333;
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
 }
 
+/* Selected state */
 .filter-button.selected {
-  background: #ffd700;
-  border-color: #ffd700;
+  background: #FFD700;
+  color: #333;
 }
 
+/* Count badge */
 .count-badge {
-  background: #f0f0f0;
+  background: rgba(0, 0, 0, 0.1);
   padding: 2px 8px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
-.filter-button:hover {
-  background: rgba(247, 184, 1, 0.1);
+/* Mobile styles */
+@media (max-width: 480px) {
+  .completion-filter {
+    gap: 8px;
+    margin: 15px auto;
+  }
+
+  .filter-button {
+    padding: 6px 12px;
+    font-size: 14px;
+    min-width: 90px;
+    flex: 1;
+    max-width: 30%;
+  }
+
+  .count-badge {
+    padding: 2px 6px;
+    font-size: 12px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .completion-filter {
+    gap: 6px;
+    padding: 0 5px;
+  }
+
+  .filter-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  .count-badge {
+    padding: 1px 4px;
+    font-size: 11px;
+  }
 }
 
 .tag-filter {
