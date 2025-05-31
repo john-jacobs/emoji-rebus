@@ -1661,3 +1661,86 @@ input:focus, button:focus {
   }
 }
 
+/* Base navigation styles */
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.logo-container img {
+  height: 40px;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #333;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.nav-link.active {
+  background-color: #0066cc;
+  color: white;
+}
+
+.sign-out-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Aggressive mobile optimization */
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0.25rem;
+    gap: 0.2rem; /* Minimal gap between items */
+    justify-content: center;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .logo-container {
+    padding: 0.25rem;
+  }
+
+  .logo-container img {
+    height: 24px; /* Smaller logo */
+  }
+
+  .nav-link, .sign-out-button {
+    padding: 0.2rem 0.3rem; /* Minimal padding */
+    font-size: 0.7rem; /* Smaller font */
+    border-radius: 3px;
+    margin: 0; /* Remove any margins */
+  }
+
+  /* Remove any flex growing */
+  .nav-link, .sign-out-button {
+    flex: 0 0 auto;
+  }
+
+  /* Ensure no text wrapping */
+  .nav-link, .sign-out-button {
+    white-space: nowrap;
+  }
+
+  /* Force single line */
+  .nav-container {
+    flex-wrap: nowrap;
+  }
+}
+
