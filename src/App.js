@@ -40,28 +40,39 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <nav>
-          <Link to="/" className="nav-logo">
-            <img src={logo} alt="EmojiCode logo" className="nav-logo-image" />
-          </Link>
-          <div className="nav-links">
-            <Link to="/">All Puzzles</Link>
-            {session ? (
-              <>
-                <Link to="/my-puzzles">My Puzzles</Link>
-                <Link to="/submit">Create</Link>
-                <button 
-                  onClick={() => supabase.auth.signOut()}
-                  className="nav-button"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <Link to="/login">Sign In</Link>
-            )}
+        <header className="header">
+          <div className="header-content">
+            <Link to="/" className="logo-link">
+              <img src={logo} alt="EmojiCode logo" className="logo" />
+            </Link>
+            
+            <div className="nav-menu">
+              <Link to="/" className="nav-item">
+                All
+              </Link>
+              {session ? (
+                <>
+                  <Link to="/my-puzzles" className="nav-item">
+                    My Puzzles
+                  </Link>
+                  <Link to="/submit" className="nav-item">
+                    Create
+                  </Link>
+                  <button 
+                    onClick={() => supabase.auth.signOut()}
+                    className="nav-item sign-out"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="nav-item">
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
-        </nav>
+        </header>
 
         <Routes>
           <Route 
