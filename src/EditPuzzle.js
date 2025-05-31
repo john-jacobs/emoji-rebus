@@ -12,7 +12,7 @@ export default function EditPuzzle() {
     emoji_sequence: "",
     answer: "",
     category_id: "",
-    hint: ""
+    hints: [""]
   });
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
@@ -41,7 +41,7 @@ export default function EditPuzzle() {
           emoji_sequence: puzzle.emojis || "",
           answer: puzzle.answer || "",
           category_id: puzzle.category_id || "",
-          hint: puzzle.hint || ""
+          hints: puzzle.hints && puzzle.hints.length > 0 ? puzzle.hints : [""]
         };
         console.log("Setting form data to:", formDataUpdate);
         setFormData(formDataUpdate);
@@ -75,24 +75,47 @@ export default function EditPuzzle() {
     fetchCategories();
   }, [fetchPuzzle, fetchCategories, id]);
 
+  const handleHintChange = (index, value) => {
+    const newHints = [...formData.hints];
+    newHints[index] = value;
+    setFormData({ ...formData, hints: newHints });
+  };
+
+  const addHint = () => {
+    setFormData({ ...formData, hints: [...formData.hints, ""] });
+  };
+
+  const removeHint = (index) => {
+    if (formData.hints.length > 1) {
+      const newHints = formData.hints.filter((_, i) => i !== index);
+      setFormData({ ...formData, hints: newHints });
+    }
+  };
+
   async function handleSubmit(e) {
     e.preventDefault();
     try {
+      const filteredHints = formData.hints.filter(hint => hint.trim() !== "");
+
       const { error } = await supabase
         .from("puzzles")
         .update({
           emojis: formData.emoji_sequence,
-          answer: formData.answer,
+          answer: formData.answer.toLowerCase().trim(),
           category_id: formData.category_id,
-          hint: formData.hint
+          hints: filteredHints,
+          type: puzzle.type
         })
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
       navigate("/my-puzzles");
     } catch (error) {
       console.error("Error updating puzzle:", error);
-      setError("Error updating puzzle");
+      setError(error.message || "Error updating puzzle");
     }
   }
 
@@ -141,12 +164,34 @@ export default function EditPuzzle() {
         </div>
 
         <div className="form-group">
-          <label>Hint (optional):</label>
-          <input
-            type="text"
-            value={formData.hint}
-            onChange={(e) => setFormData({ ...formData, hint: e.target.value })}
-          />
+          <label>Hints:</label>
+          {formData.hints.map((hint, index) => (
+            <div key={index} className="hint-input-group">
+              <input
+                type="text"
+                value={hint}
+                onChange={(e) => handleHintChange(index, e.target.value)}
+                placeholder={`Hint ${index + 1}`}
+                className="hint-input"
+              />
+              {formData.hints.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeHint(index)}
+                  className="remove-hint-button"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addHint}
+            className="add-hint-button"
+          >
+            Add Hint
+          </button>
         </div>
 
         <div className="button-group">

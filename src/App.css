@@ -1030,90 +1030,43 @@ input:focus, button:focus {
 
 .hint-input-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 10px;
+  margin-bottom: 10px;
   align-items: center;
 }
 
-.hint-remove-button {
-  padding: 0.4rem;
-  font-size: 1rem;
-  color: #666;
-  background: none;
+.hint-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.remove-hint-button {
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: white;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.hint-remove-button:hover {
-  color: #d33;
+.remove-hint-button:hover {
+  background-color: #c82333;
 }
 
-.hint-add-button {
-  margin-top: 0.2rem;
-  padding: 0.6rem 1rem;
-  background: none;
-  border: 2px dashed #f7b801;
-  color: #17264d;
-  border-radius: 0.8rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: fit-content;
-  align-self: center;
-}
-
-.hint-add-button:hover {
-  background: rgba(247, 184, 1, 0.1);
-  border-style: solid;
-}
-
-/* Puzzle Detail Hints */
-.puzzle-detail-hints {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  width: 100%;
-  max-width: 500px;
-}
-
-.hint-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.hint-button {
-  background: #f7b801;
-  color: #17264d;
+.add-hint-button {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.8rem;
-  font-weight: 600;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
-  width: fit-content;
-  align-self: center;
+  margin-top: 10px;
 }
 
-.hint-button:hover {
-  background: #e5ac00;
-  transform: translateY(-1px);
-}
-
-.hint-text {
-  background: rgba(247, 184, 1, 0.1);
-  padding: 1rem;
-  border-radius: 0.8rem;
-  color: #17264d;
-  font-size: 0.95rem;
-  text-align: center;
-  border: 1px solid rgba(247, 184, 1, 0.3);
+.add-hint-button:hover {
+  background-color: #218838;
 }
 
 /* Puzzle Solved Information */
