@@ -288,47 +288,42 @@ button:focus {
 
 .completion-filter {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem;
-  background: rgba(23, 38, 77, 0.05);
-  border-radius: 2rem;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .filter-button {
-  padding: 0.5rem 1.25rem;
-  border: none;
-  background: none;
-  border-radius: 1.5rem;
-  color: #17264d;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
   cursor: pointer;
-  transition: all 0.2s;
+  font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  min-width: 100px;
+  justify-content: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filter-button.selected {
+  background: #ffd700;
+  border-color: #ffd700;
 }
 
 .count-badge {
-  background: rgba(23, 38, 77, 0.1);
-  padding: 0.15rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  min-width: 1.5rem;
-  text-align: center;
-}
-
-.filter-button.selected .count-badge {
-  background: rgba(23, 38, 77, 0.2);
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
 }
 
 .filter-button:hover {
   background: rgba(247, 184, 1, 0.1);
-}
-
-.filter-button.selected {
-  background: #f7b801;
-  color: #17264d;
 }
 
 .tag-filter {
@@ -667,14 +662,19 @@ button:focus {
   }
 
   .completion-filter {
-    width: 100%;
-    justify-content: center;
-    padding: 0.2rem;
+    gap: 8px;
+    padding: 0 10px;
   }
 
   .filter-button {
-    padding: 0.4rem 1rem;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    font-size: 13px;
+    min-width: 90px;
+  }
+
+  .count-badge {
+    padding: 2px 6px;
+    font-size: 11px;
   }
 }
 
@@ -1574,5 +1574,18 @@ input:focus, button:focus {
   color: #d32f2f;
   background-color: #ffebee;
   border-radius: 4px;
+}
+
+/* For very small screens */
+@media (max-width: 360px) {
+  .completion-filter {
+    gap: 6px;
+  }
+
+  .filter-button {
+    padding: 4px 10px;
+    font-size: 12px;
+    min-width: 80px;
+  }
 }
 
