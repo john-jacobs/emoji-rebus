@@ -655,33 +655,41 @@ input:focus, button:focus {
 .hint-button {
   padding: 0.5rem 1rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 20px;
   background: white;
-  color: #000;
+  color: #17264d;
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
-  width: 100%;
-  text-align: left;
+  display: inline-block;
+  margin: 0.3rem 0;
   font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .hint-button:hover {
-  background-color: #f0f0f0;
-  border-color: #0066cc;
+  background-color: #f7b801;
+  border-color: #f7b801;
+  color: #17264d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* Hint container and text styles */
 .hint-container {
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .hint-text {
   margin-top: 0.5rem;
   padding: 0.75rem;
   background-color: #f5f5f5;
-  border-radius: 4px;
+  border-radius: 12px;
   color: #333;
+  text-align: left;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .puzzle-hints {
@@ -1672,5 +1680,110 @@ textarea.form-input {
     padding: 0.2rem 0.3rem;
     font-size: 0.7rem;
   }
+}
+
+/* Update/add these styles */
+.puzzle-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.puzzle-grid-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.puzzle-grid-header-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.my-puzzles-stats {
+  color: #666;
+  margin: 1rem 0;
+}
+
+/* Style for each puzzle card in My Puzzles */
+.puzzle-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+
+.puzzle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Style for the emoji display in cards */
+.puzzle-card-emoji {
+  text-align: center;
+  font-size: 2rem;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for the metadata section */
+.puzzle-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Style for edit/delete buttons */
+.puzzle-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.edit-button,
+.delete-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-button {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.delete-button {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.edit-button:hover {
+  background: #c8e6c9;
+}
+
+.delete-button:hover {
+  background: #ffcdd2;
 }
 

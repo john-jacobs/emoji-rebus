@@ -6,53 +6,25 @@ import "./App.css";
 
 function MyPuzzleCard({ puzzle, onDelete }) {
   const navigate = useNavigate();
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const emojiSize = calculateEmojiSize(300, puzzle.emojis);
-
-  const handleDelete = async (e) => {
-    e.stopPropagation();
-    if (showDeleteConfirm) {
-      try {
-        const { error } = await supabase
-          .from('puzzles')
-          .delete()
-          .eq('id', puzzle.id);
-
-        if (error) throw error;
-        onDelete(puzzle.id);
-      } catch (error) {
-        console.error('Error deleting puzzle:', error);
-        alert('Failed to delete puzzle');
-      }
-    } else {
-      setShowDeleteConfirm(true);
-    }
-  };
+  const emojiSize = calculateEmojiSize(300, puzzle.emojis); // 300px is the minimum card width
 
   return (
-    <div 
-      className="puzzle-card my-puzzle"
-      onClick={() => navigate(`/puzzle/${puzzle.id}`)}
-    >
+    <div className="puzzle-card">
       <div className="puzzle-card-actions">
         <button 
           className="edit-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/edit-puzzle/${puzzle.id}`);
-          }}
+          onClick={() => navigate(`/edit-puzzle/${puzzle.id}`)}
         >
           ✏️ Edit
         </button>
         <button 
-          className={`delete-button ${showDeleteConfirm ? 'confirm' : ''}`}
-          onClick={handleDelete}
-          onMouseLeave={() => setShowDeleteConfirm(false)}
+          className="delete-button"
+          onClick={() => onDelete(puzzle.id)}
         >
-          {showDeleteConfirm ? '🗑️ Confirm' : '🗑️ Delete'}
+          🗑️ Delete
         </button>
       </div>
-
+      
       <div 
         className="puzzle-card-emoji"
         style={{ fontSize: `${emojiSize}px` }}
@@ -62,20 +34,11 @@ function MyPuzzleCard({ puzzle, onDelete }) {
       
       <div className="puzzle-card-meta">
         <div className="puzzle-type">
-          Type: <span className="emoji">
-            {puzzle.type === "Phonetic" 
-              ? "🔤"
-              : puzzle.type === "Symbolic" 
-              ? "🧩"
-              : "📝"}
-          </span>
-          {puzzle.type}
+          <span>Type: {puzzle.type}</span>
         </div>
-        {puzzle.categories && (
-          <div className="puzzle-category">
-            Category: <span className="puzzle-category-text">{puzzle.categories.name}</span>
-          </div>
-        )}
+        <div className="puzzle-category">
+          <span>Category: {puzzle.categories?.name}</span>
+        </div>
       </div>
     </div>
   );
