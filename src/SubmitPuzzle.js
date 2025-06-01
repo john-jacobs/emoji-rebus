@@ -9,6 +9,7 @@ export default function SubmitPuzzle() {
   const [hints, setHints] = useState(['']); // Initialize with one empty hint
   const [category, setCategory] = useState('');
   const [type, setType] = useState('');
+  const [explanation, setExplanation] = useState(''); // Add explanation state
   const [status, setStatus] = useState('');
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
@@ -80,7 +81,8 @@ export default function SubmitPuzzle() {
           hints: filteredHints,
           category_id: category,
           created_by: session.user.id,
-          type
+          type,
+          explanation: explanation.trim() || null // Add explanation to insert
         }
       ])
       .select();
@@ -94,6 +96,7 @@ export default function SubmitPuzzle() {
       setHints(['']);
       setCategory('');
       setType('');
+      setExplanation(''); // Clear explanation
       
       // Navigate to the puzzle detail page using the newly created puzzle's ID
       const newPuzzleId = data[0].id;
@@ -200,7 +203,7 @@ export default function SubmitPuzzle() {
               Category <span className="required">*</span>
             </label>
             <select
-              className="form-input"
+              className="form-select"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
@@ -212,6 +215,20 @@ export default function SubmitPuzzle() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Add Explanation Field */}
+          <div className="form-group">
+            <label className="form-label">
+              Explanation <span className="optional">(optional)</span>
+            </label>
+            <textarea
+              className="form-input"
+              placeholder="Add an explanation for how the puzzle works (will be shown after solving)"
+              value={explanation}
+              onChange={(e) => setExplanation(e.target.value)}
+              rows={3}
+            />
           </div>
 
           {/* Hints Input */}

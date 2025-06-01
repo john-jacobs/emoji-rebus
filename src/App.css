@@ -741,22 +741,42 @@ input:focus, button:focus {
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  text-align: center;
-  width: 100%;
-  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 .form-label {
-  font-weight: 600;
-  color: #17264d;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.optional {
+  color: #666;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+textarea.form-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
 .hint-label, .optional-label {
@@ -812,28 +832,8 @@ input:focus, button:focus {
   font-size: 1.4rem;
 }
 
-.form-input {
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
-  border: 2px solid #f7b801;
-  border-radius: 1.2rem;
-  background: #fffdfa;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  text-align: center;
-  color: #666;
-}
-
 .form-input::placeholder {
   color: #999;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #17264d;
-  box-shadow: 0 2px 8px rgba(23, 38, 77, 0.1);
 }
 
 .emoji-input {
