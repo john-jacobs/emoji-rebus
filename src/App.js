@@ -18,36 +18,51 @@ function App() {
   const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
-    const initializeSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('Session initialized:', session?.user?.id);
-      setSession(session);
-      
-      if (session) {
-        console.log('Triggering sync after session init');
-        await syncCompletedPuzzles();
+    const initializeApp = async () => {
+      try {
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session:', session?.user?.id);
+        setSession(session);
+        
+        if (session) {
+          console.log('Syncing completed puzzles...');
+          await syncCompletedPuzzles();
+          console.log('Sync completed');
+        }
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      } finally {
+        setLoading(false); // Always set loading to false
       }
-      setLoading(false);
     };
 
-    initializeSession();
+    initializeApp();
 
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log('Auth state changed:', session?.user?.id);
       setSession(session);
+      
       if (session) {
-        console.log('Triggering sync after auth state change');
-        await syncCompletedPuzzles();
+        try {
+          console.log('Syncing after auth change...');
+          await syncCompletedPuzzles();
+          console.log('Sync completed');
+        } catch (error) {
+          console.error('Error syncing after auth change:', error);
+        }
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // Show loading spinner only during initial load
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading-screen">Loading...</div>;
   }
 
   return (
