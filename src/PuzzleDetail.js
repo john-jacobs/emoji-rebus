@@ -185,6 +185,11 @@ export default function PuzzleDetail() {
             type="text"
             value={guess}
             onChange={(e) => setGuess(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSubmit();
+              }
+            }}
             placeholder="Your answer..."
             className="puzzle-input"
           />
