@@ -170,18 +170,6 @@ export default function EditPuzzle() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">
-            Explanation <span className="optional-label">(optional)</span>
-          </label>
-          <textarea
-            value={explanation}
-            onChange={(e) => setExplanation(e.target.value)}
-            placeholder="Add an explanation for how the puzzle works (will be shown after solving)"
-            className="form-textarea"
-          />
-        </div>
-
-        <div className="form-group">
           <label className="form-label">Hints:</label>
           {formData.hints.map((hint, index) => (
             <div key={index} className="hint-input-group">
@@ -210,6 +198,19 @@ export default function EditPuzzle() {
           >
             Add Hint
           </button>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">
+            Explanation <span className="optional-label">(optional)</span>
+          </label>
+          <textarea
+            value={explanation}
+            onChange={(e) => setExplanation(e.target.value)}
+            placeholder="Add an explanation for how the puzzle works (will be shown after solving)"
+            className="form-textarea explanation-input"
+            rows={3}
+          />
         </div>
 
         <div className="button-group">

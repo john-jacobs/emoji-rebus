@@ -1990,3 +1990,42 @@ textarea.form-input {
   color: #666;
 }
 
+/* Update textarea styling */
+.explanation-input {
+  min-height: 100px; /* Make explanation box taller than regular inputs */
+  resize: vertical; /* Allow vertical resizing */
+  line-height: 1.4;
+  font-size: 0.95rem;
+}
+
+/* Ensure consistent styling with other form elements */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.optional-label {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: normal;
+}
+
+/* Style the textarea to match other inputs but allow for more content */
+.form-textarea {
+  padding: 0.75rem;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #f7b801;
+  box-shadow: 0 0 0 2px rgba(247, 184, 1, 0.1);
+}
+
