@@ -290,7 +290,6 @@ button:focus {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   position: relative;
   min-height: 180px;
 }
@@ -307,7 +306,8 @@ button:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .puzzle-card-meta {
@@ -1325,7 +1325,7 @@ textarea.form-input {
 
 .puzzle-card-actions {
   position: absolute;
-  top: 0.75rem;
+  top: 0.5rem;
   left: 0;
   right: 0;
   display: flex;
@@ -1718,7 +1718,6 @@ textarea.form-input {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   position: relative;
   min-height: 180px;
 }
@@ -1736,7 +1735,8 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Style for the metadata section */
@@ -1752,7 +1752,7 @@ textarea.form-input {
 /* Style for edit/delete buttons */
 .puzzle-card-actions {
   position: absolute;
-  top: 0.75rem;
+  top: 0.5rem;
   left: 0;
   right: 0;
   display: flex;
