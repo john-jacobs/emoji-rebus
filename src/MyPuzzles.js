@@ -32,6 +32,17 @@ function MyPuzzleCard({ puzzle, onDelete }) {
         {puzzle.emojis}
       </div>
       
+      <div className="puzzle-solution">
+        <div className="solution-text">
+          <strong>Answer:</strong> {puzzle.answer}
+        </div>
+        {puzzle.explanation && (
+          <div className="explanation-text">
+            <strong>Explanation:</strong> {puzzle.explanation}
+          </div>
+        )}
+      </div>
+      
       <div className="puzzle-card-meta">
         <div className="puzzle-type">
           <span>Type: {puzzle.type}</span>
@@ -47,6 +58,7 @@ function MyPuzzleCard({ puzzle, onDelete }) {
 export default function MyPuzzles() {
   const navigate = useNavigate();
   const [puzzles, setPuzzles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -87,6 +99,17 @@ export default function MyPuzzles() {
     setPuzzles(puzzles.filter(p => p.id !== puzzleId));
   };
 
+  const filteredPuzzles = puzzles.filter(puzzle => {
+    const searchString = searchTerm.toLowerCase();
+    return (
+      puzzle.emojis.toLowerCase().includes(searchString) ||
+      puzzle.answer.toLowerCase().includes(searchString) ||
+      puzzle.type.toLowerCase().includes(searchString) ||
+      puzzle.categories?.name.toLowerCase().includes(searchString) ||
+      (puzzle.explanation && puzzle.explanation.toLowerCase().includes(searchString))
+    );
+  });
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -104,21 +127,36 @@ export default function MyPuzzles() {
             Total Puzzles Created: {puzzles.length}
           </div>
         </div>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search puzzles..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
       </div>
 
-      {puzzles.length === 0 ? (
+      {filteredPuzzles.length === 0 ? (
         <div className="empty-state">
-          <p>You haven't created any puzzles yet.</p>
-          <button 
-            className="create-button"
-            onClick={() => navigate('/submit')}
-          >
-            Create Your First Puzzle
-          </button>
+          {searchTerm ? (
+            <p>No puzzles match your search.</p>
+          ) : (
+            <>
+              <p>You haven't created any puzzles yet.</p>
+              <button 
+                className="create-button"
+                onClick={() => navigate('/submit')}
+              >
+                Create Your First Puzzle
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="puzzle-cards">
-          {puzzles.map((puzzle) => (
+          {filteredPuzzles.map((puzzle) => (
             <MyPuzzleCard 
               key={puzzle.id} 
               puzzle={puzzle}
