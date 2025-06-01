@@ -18,21 +18,60 @@ const saveToLocalStorage = (puzzleIds) => {
   localStorage.setItem(COMPLETED_PUZZLES_KEY, JSON.stringify(puzzleIds));
 };
 
-// Get completed puzzles from database
-const getDbCompletedPuzzles = async () => {
-  const { data, error } = await supabase
-    .from('completed_puzzles')
-    .select('puzzle_id');
+export const syncCompletedPuzzles = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    
+    if (!userId) {
+      console.log('No user session found, skipping sync');
+      return;
+    }
 
-  if (error) {
-    console.error('Error fetching completed puzzles:', error);
-    return [];
+    // Get local puzzles
+    const localCompleted = getCompletedPuzzles();
+    console.log('Local puzzles to sync:', localCompleted);
+
+    // First, check which puzzles are already completed in the database
+    const { data: existingCompletions } = await supabase
+      .from('completed_puzzles')
+      .select('puzzle_id')
+      .eq('user_id', userId);
+
+    const existingPuzzleIds = existingCompletions?.map(c => c.puzzle_id) || [];
+    console.log('Existing completed puzzles:', existingPuzzleIds);
+
+    // Filter out puzzles that are already completed
+    const newPuzzles = localCompleted.filter(id => !existingPuzzleIds.includes(id));
+    console.log('New puzzles to sync:', newPuzzles);
+
+    if (newPuzzles.length === 0) {
+      console.log('No new puzzles to sync');
+      return;
+    }
+
+    // Prepare the data for insertion
+    const completionsToInsert = newPuzzles.map(puzzleId => ({
+      user_id: userId,
+      puzzle_id: puzzleId
+    }));
+
+    // Insert new completions
+    const { data, error } = await supabase
+      .from('completed_puzzles')
+      .insert(completionsToInsert);
+
+    if (error) {
+      console.error('Sync error details:', error);
+      throw error;
+    }
+
+    console.log('Successfully synced puzzles:', data);
+  } catch (error) {
+    console.error('Error in syncCompletedPuzzles:', error);
   }
-
-  return data.map(item => item.puzzle_id);
 };
 
-// Mark puzzle as completed in both localStorage and database
 export const markPuzzleAsCompleted = async (puzzleId) => {
   try {
     // Update localStorage
@@ -43,13 +82,13 @@ export const markPuzzleAsCompleted = async (puzzleId) => {
     }
 
     // If user is logged in, update database
-    const session = await supabase.auth.getSession();
-    if (session?.data?.session?.user) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
       const { error } = await supabase
         .from('completed_puzzles')
-        .upsert({
+        .insert({
           puzzle_id: puzzleId,
-          user_id: session.data.session.user.id
+          user_id: session.user.id
         });
 
       if (error && error.code !== '23505') { // Ignore unique violation errors
@@ -61,7 +100,6 @@ export const markPuzzleAsCompleted = async (puzzleId) => {
   }
 };
 
-// Check if puzzle is completed (checks both localStorage and database)
 export const isPuzzleCompleted = async (puzzleId) => {
   try {
     // Check localStorage first
@@ -71,8 +109,8 @@ export const isPuzzleCompleted = async (puzzleId) => {
     }
 
     // If user is logged in, check database
-    const session = await supabase.auth.getSession();
-    if (session?.data?.session?.user) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
       const { data, error } = await supabase
         .from('completed_puzzles')
         .select('puzzle_id')
@@ -93,56 +131,5 @@ export const isPuzzleCompleted = async (puzzleId) => {
   } catch (error) {
     console.error('Error checking puzzle completion:', error);
     return false;
-  }
-};
-
-// Sync completed puzzles between localStorage and database
-export const syncCompletedPuzzles = async () => {
-  try {
-    const session = await supabase.auth.getSession();
-    console.log('Current session:', session?.data?.session?.user?.id);
-    
-    if (!session?.data?.session?.user) {
-      console.log('No user session found');
-      return;
-    }
-
-    // Get puzzles from both sources
-    const localCompleted = getCompletedPuzzles();
-    console.log('Local completed puzzles:', localCompleted);
-
-    const dbCompleted = await getDbCompletedPuzzles();
-    console.log('DB completed puzzles:', dbCompleted);
-
-    // Merge both sets
-    const allCompleted = [...new Set([...localCompleted, ...dbCompleted])];
-    console.log('Merged completed puzzles:', allCompleted);
-
-    // Update localStorage with merged data
-    saveToLocalStorage(allCompleted);
-
-    // Update database with any missing completions
-    const newCompletions = localCompleted.filter(id => !dbCompleted.includes(id));
-    console.log('New completions to sync:', newCompletions);
-
-    if (newCompletions.length > 0) {
-      console.log('Attempting to sync to database...');
-      const { data, error } = await supabase
-        .from('completed_puzzles')
-        .upsert(
-          newCompletions.map(puzzleId => ({
-            puzzle_id: puzzleId,
-            user_id: session.data.session.user.id
-          }))
-        );
-
-      if (error) {
-        console.error('Error syncing to database:', error);
-      } else {
-        console.log('Successfully synced to database:', data);
-      }
-    }
-  } catch (error) {
-    console.error('Error in syncCompletedPuzzles:', error);
   }
 }; 
