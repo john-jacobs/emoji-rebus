@@ -16,6 +16,7 @@ export default function EditPuzzle() {
   });
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
+  const [explanation, setExplanation] = useState("");
 
   const fetchPuzzle = useCallback(async () => {
     try {
@@ -46,6 +47,7 @@ export default function EditPuzzle() {
         console.log("Setting form data to:", formDataUpdate);
         setFormData(formDataUpdate);
         setPuzzle(puzzle);
+        setExplanation(puzzle.explanation || "");
       }
     } catch (error) {
       console.error("Error fetching puzzle:", error);
@@ -104,7 +106,7 @@ export default function EditPuzzle() {
           answer: formData.answer.toLowerCase().trim(),
           category_id: formData.category_id,
           hints: filteredHints,
-          type: puzzle.type
+          explanation: explanation.trim() || null
         })
         .eq("id", id);
 
@@ -124,34 +126,38 @@ export default function EditPuzzle() {
   if (!puzzle) return <div className="error">Puzzle not found</div>;
 
   return (
-    <div className="submit-container">
-      <h2>Edit Puzzle</h2>
-      <form onSubmit={handleSubmit} className="submit-form">
+    <div className="edit-puzzle-container">
+      <h1 className="edit-puzzle-title">Edit Puzzle</h1>
+      
+      <form onSubmit={handleSubmit} className="edit-puzzle-form">
         <div className="form-group">
-          <label>Emoji Sequence:</label>
+          <label className="form-label">Emoji Sequence:</label>
           <input
             type="text"
             value={formData.emoji_sequence}
             onChange={(e) => setFormData({ ...formData, emoji_sequence: e.target.value })}
+            className="form-input emoji-input"
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Answer:</label>
+          <label className="form-label">Answer:</label>
           <input
             type="text"
             value={formData.answer}
             onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+            className="form-input"
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Category:</label>
+          <label className="form-label">Category:</label>
           <select
             value={formData.category_id}
             onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+            className="form-select"
             required
           >
             <option value="">Select a category</option>
@@ -164,7 +170,19 @@ export default function EditPuzzle() {
         </div>
 
         <div className="form-group">
-          <label>Hints:</label>
+          <label className="form-label">
+            Explanation <span className="optional-label">(optional)</span>
+          </label>
+          <textarea
+            value={explanation}
+            onChange={(e) => setExplanation(e.target.value)}
+            placeholder="Add an explanation for how the puzzle works (will be shown after solving)"
+            className="form-textarea"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Hints:</label>
           {formData.hints.map((hint, index) => (
             <div key={index} className="hint-input-group">
               <input
@@ -172,7 +190,7 @@ export default function EditPuzzle() {
                 value={hint}
                 onChange={(e) => handleHintChange(index, e.target.value)}
                 placeholder={`Hint ${index + 1}`}
-                className="hint-input"
+                className="form-input"
               />
               {formData.hints.length > 1 && (
                 <button
@@ -195,7 +213,7 @@ export default function EditPuzzle() {
         </div>
 
         <div className="button-group">
-          <button type="submit" className="submit-button">
+          <button type="submit" className="update-button">
             Update Puzzle
           </button>
           <button
