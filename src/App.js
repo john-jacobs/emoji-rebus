@@ -10,6 +10,7 @@ import "./App.css";
 import logo from "./logo-transparent.png";
 import MyPuzzles from "./MyPuzzles";
 import EditPuzzle from "./EditPuzzle";
+import { syncCompletedPuzzles } from './utils/storage';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -17,17 +18,29 @@ function App() {
   const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initializeSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Session initialized:', session?.user?.id);
       setSession(session);
+      
+      if (session) {
+        console.log('Triggering sync after session init');
+        await syncCompletedPuzzles();
+      }
       setLoading(false);
-    });
+    };
 
-    // Listen for auth changes
+    initializeSession();
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('Auth state changed:', session?.user?.id);
       setSession(session);
+      if (session) {
+        console.log('Triggering sync after auth state change');
+        await syncCompletedPuzzles();
+      }
     });
 
     return () => subscription.unsubscribe();
