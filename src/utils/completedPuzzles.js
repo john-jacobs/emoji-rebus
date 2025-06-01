@@ -100,4 +100,15 @@ export const isPuzzleCompleted = async (puzzleId) => {
     console.error('Error checking puzzle completion:', error);
     return false;
   }
+};
+
+// Add a synchronous version for immediate access
+export const getCompletedPuzzlesSync = () => {
+  try {
+    const stored = localStorage.getItem(COMPLETED_PUZZLES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error reading completed puzzles:', error);
+    return [];
+  }
 }; 

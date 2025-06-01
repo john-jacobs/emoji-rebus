@@ -16,6 +16,7 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [completionFilter, setCompletionFilter] = useState('all');
 
   useEffect(() => {
     console.log('App mounting...');
@@ -105,6 +106,8 @@ function App() {
               <PuzzleGrid 
                 selectedTags={selectedTags}
                 setSelectedTags={setSelectedTags}
+                completionFilter={completionFilter}
+                setCompletionFilter={setCompletionFilter}
               />
             } 
           />
