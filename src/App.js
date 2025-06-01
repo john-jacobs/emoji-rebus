@@ -18,51 +18,47 @@ function App() {
   const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        // Get initial session
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session:', session?.user?.id);
-        setSession(session);
-        
-        if (session) {
-          console.log('Syncing completed puzzles...');
-          await syncCompletedPuzzles();
-          console.log('Sync completed');
-        }
-      } catch (error) {
-        console.error('Error initializing app:', error);
-      } finally {
-        setLoading(false); // Always set loading to false
-      }
-    };
+    console.log('App mounting...');
 
-    initializeApp();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Got initial session:', !!session);
+      setSession(session);
+      setLoading(false);
+    }).catch(error => {
+      console.error('Error getting session:', error);
+      setLoading(false);
+    });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('Auth state changed:', session?.user?.id);
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', !!session);
       setSession(session);
       
       if (session) {
-        try {
-          console.log('Syncing after auth change...');
-          await syncCompletedPuzzles();
-          console.log('Sync completed');
-        } catch (error) {
-          console.error('Error syncing after auth change:', error);
-        }
+        // Don't await this - let it run in the background
+        syncCompletedPuzzles().catch(error => {
+          console.error('Error syncing puzzles:', error);
+        });
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Cleaning up subscription...');
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // Show loading spinner only during initial load
+  console.log('Render state:', { loading, hasSession: !!session });
+
   if (loading) {
-    return <div className="loading-screen">Loading...</div>;
+    return (
+      <div className="loading-screen">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
