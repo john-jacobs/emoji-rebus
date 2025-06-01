@@ -89,7 +89,8 @@ export const markPuzzleAsCompleted = async (puzzleId) => {
         .insert({
           puzzle_id: puzzleId,
           user_id: session.user.id
-        });
+        })
+        .select('*');
 
       if (error && error.code !== '23505') { // Ignore unique violation errors
         console.error('Error saving to database:', error);
@@ -113,9 +114,10 @@ export const isPuzzleCompleted = async (puzzleId) => {
     if (session?.user) {
       const { data, error } = await supabase
         .from('completed_puzzles')
-        .select('puzzle_id')
+        .select('*')
         .eq('puzzle_id', puzzleId)
-        .single();
+        .eq('user_id', session.user.id)
+        .maybeSingle();
 
       if (!error && data) {
         // Update localStorage with this information
