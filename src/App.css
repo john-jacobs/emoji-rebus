@@ -285,13 +285,14 @@ button:focus {
 .puzzle-card {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2.5rem 1.5rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   position: relative;
+  min-height: 200px;
 }
 
 .puzzle-card:hover {
@@ -301,10 +302,12 @@ button:focus {
 
 .puzzle-card-emoji {
   text-align: center;
-  min-height: 100px;
+  font-size: 2rem;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0.5rem;
 }
 
 .puzzle-card-meta {
@@ -313,6 +316,7 @@ button:focus {
   gap: 0.5rem;
   font-size: 0.9rem;
   color: #666;
+  margin-top: auto;
 }
 
 .puzzle-type, .puzzle-category {
@@ -1320,50 +1324,45 @@ textarea.form-input {
 }
 
 .puzzle-card-actions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
   display: flex;
   gap: 0.5rem;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
   z-index: 1;
 }
 
 .edit-button,
 .delete-button {
   padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-  opacity: 0.8;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid;
+  border-radius: 6px;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .edit-button {
+  background: #e8f5e9;
   color: #2e7d32;
-  border-color: #2e7d32;
-}
-
-.edit-button:hover {
-  background: #2e7d32;
-  color: white;
-  opacity: 1;
+  border: 1px solid #a5d6a7;
 }
 
 .delete-button {
-  color: #d32f2f;
-  border-color: #d32f2f;
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.edit-button:hover {
+  background: #c8e6c9;
 }
 
 .delete-button:hover {
-  background: #d32f2f;
-  color: white;
-  opacity: 1;
+  background: #ffcdd2;
 }
 
 .delete-button.confirm {
@@ -1712,13 +1711,14 @@ textarea.form-input {
 .puzzle-card {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2.5rem 1.5rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   position: relative;
+  min-height: 200px;
 }
 
 .puzzle-card:hover {
@@ -1734,6 +1734,7 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0.5rem;
 }
 
 /* Style for the metadata section */
@@ -1743,28 +1744,30 @@ textarea.form-input {
   gap: 0.5rem;
   font-size: 0.9rem;
   color: #666;
+  margin-top: auto;
 }
 
 /* Style for edit/delete buttons */
 .puzzle-card-actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
 }
 
 .edit-button,
 .delete-button {
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 0.3rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .edit-button {
