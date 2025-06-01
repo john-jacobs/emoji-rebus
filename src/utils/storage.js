@@ -33,10 +33,15 @@ export const syncCompletedPuzzles = async () => {
     console.log('Local puzzles to sync:', localCompleted);
 
     // First, check which puzzles are already completed in the database
-    const { data: existingCompletions } = await supabase
+    const { data: existingCompletions, error: fetchError } = await supabase
       .from('completed_puzzles')
       .select('puzzle_id')
       .eq('user_id', userId);
+
+    if (fetchError) {
+      console.error('Error fetching existing completions:', fetchError);
+      return;
+    }
 
     const existingPuzzleIds = existingCompletions?.map(c => c.puzzle_id) || [];
     console.log('Existing completed puzzles:', existingPuzzleIds);
@@ -50,25 +55,28 @@ export const syncCompletedPuzzles = async () => {
       return;
     }
 
-    // Prepare the data for insertion
-    const completionsToInsert = newPuzzles.map(puzzleId => ({
-      user_id: userId,
-      puzzle_id: puzzleId
-    }));
+    // Use upsert instead of insert to handle duplicates gracefully
+    for (const puzzleId of newPuzzles) {
+      const { error } = await supabase
+        .from('completed_puzzles')
+        .upsert({
+          user_id: userId,
+          puzzle_id: puzzleId
+        }, {
+          onConflict: 'user_id,puzzle_id',
+          ignoreDuplicates: true
+        });
 
-    // Insert new completions
-    const { data, error } = await supabase
-      .from('completed_puzzles')
-      .insert(completionsToInsert);
-
-    if (error) {
-      console.error('Sync error details:', error);
-      throw error;
+      if (error && error.code !== '23505') { // Ignore unique violation errors
+        console.log(`Error syncing puzzle ${puzzleId}:`, error);
+      } else {
+        console.log(`Successfully synced puzzle: ${puzzleId}`);
+      }
     }
 
-    console.log('Successfully synced puzzles:', data);
+    console.log('Sync completed successfully');
   } catch (error) {
-    console.error('Error in syncCompletedPuzzles:', error);
+    console.error('Error in syncCompletedPuzzles:', error.message || error);
   }
 };
 
